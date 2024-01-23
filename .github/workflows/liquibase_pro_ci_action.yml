@@ -125,14 +125,15 @@ jobs:
 
     steps:
       # Zip the source into a file called release.zip
-      - name: zip
-        run: zip -r release.zip .
+      #- name: zip
+      #  run: zip -r release.zip .
 
       # Upload a copy to GHA for auditability
       - uses: actions/upload-artifact@v3
         with:
           name: SNAPSHOT-artifact-${{ github.run_id }}.${{ github.run_number }}.zip
-          path: release.zip
+          #path: release.zip
+          path: *.*
 
 ####################################################################
 #  Artifact upload

@@ -90,7 +90,6 @@ jobs:
       # Unzip the artifact into the newly created ./artifact directory
       - name: Unzip artifact
         run: |
-          REM unzip SNAPSHOT-artifact-${{ inputs.artifact-version }}.zip -d ./artifact
           unzip artifact.zip -d ./artifact
           du -ah
   ####################################################################
