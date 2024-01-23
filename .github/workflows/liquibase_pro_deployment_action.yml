@@ -66,7 +66,7 @@ jobs:
 
     steps:
       # Download the GitHub artifact
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v3
         with:
           name: SNAPSHOT-artifact-7629865294.7.zip
           github-token: ${{ secrets.GH_PAT }} # token with actions:read permissions on target repo
