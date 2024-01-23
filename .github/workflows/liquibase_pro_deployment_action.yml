@@ -52,7 +52,7 @@ jobs:
   #  Update using repo
   #########################################################################
 
-  liquibase-rollback-action:
+  database-deploy:
     runs-on: [self-hosted]
     environment: ${{ inputs.environment }}
 
