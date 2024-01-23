@@ -45,9 +45,6 @@ env:
   LIQUIBASE_COMMAND_USERNAME: ${{ secrets.LIQUIBASE_USERNAME }}
   LIQUIBASE_COMMAND_PASSWORD: ${{ secrets.LIQUIBASE_PASSWORD }}
 
-  # Disable sending data to Liquibase Hub
-  LIQUIBASE_HUB_MODE: off
-
   # Pro License key
   # See https://docs.liquibase.com/workflows/liquibase-pro/how-to-apply-your-liquibase-pro-license-key.html
   LIQUIBASE_LICENSE_KEY: ${{ secrets.LIQUIBASE_PRO_LICENSE_KEY }}
@@ -69,15 +66,37 @@ jobs:
 
     steps:
       # Clean the workspace to help clean up self-Hosted runners prior to deployment
-      - uses: AutoModality/action-clean@v1
+      #- uses: AutoModality/action-clean@v1
 
       # Download the artifact from JFrog
-      - name: Download artifact into a new directory named artifact
-        run: |
-          mkdir ./artifact
-          curl -H "Authorization: Bearer ${{ env.ARTIFACTORY_BEARER_TOKEN }}" \
-            ${{ env.ARTIFACTORY_URI_PREFIX }}SNAPSHOT-artifact-${{ inputs.artifact-version }}.zip \
-             -O -J -L 
+      # - name: Download artifact into a new directory named artifact
+        # run: |
+          # mkdir ./artifact
+          # curl -H "Authorization: Bearer ${{ env.ARTIFACTORY_BEARER_TOKEN }}" \
+            # ${{ env.ARTIFACTORY_URI_PREFIX }}SNAPSHOT-artifact-${{ inputs.artifact-version }}.zip \
+             # -O -J -L       
+             
+      # Download the artifact from GitHub Artifacts
+      # - name: Download artifact into a new directory named artifact
+        # run: |
+          # mkdir ./artifact
+          
+          # curl -L \
+           # -H "Accept: application/vnd.github+json" \
+           # -H "Authorization: Bearer <YOUR-TOKEN>" \
+           # -H "X-GitHub-Api-Version: 2022-11-28" \
+          # https://api.github.com/repos/OWNER/REPO/actions/artifacts/ARTIFACT_ID/ARCHIVE_FORMAT
+          
+          # curl -H "Authorization: Bearer ${{ env.ARTIFACTORY_BEARER_TOKEN }}" \
+            # ${{ env.ARTIFACTORY_URI_PREFIX }}SNAPSHOT-artifact-${{ inputs.artifact-version }}.zip \
+             # -O -J -L
+             
+      - uses: actions/download-artifact@v4
+          with:
+          name: SNAPSHOT-artifact-7629865294.7.zip
+          github-token: ${{ secrets.GH_PAT }} # token with actions:read permissions on target repo
+          repository: actions/toolkit
+          run-id: 7629865294   
 
       # Unzip the artifact into the newly created ./artifact directory
       - name: Unzip artifact

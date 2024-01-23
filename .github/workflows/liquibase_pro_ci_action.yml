@@ -28,7 +28,7 @@ env:
   LIQUIBASE_SEARCH_PATH: src/main/resources/changelogs,s3://${{ secrets.AWS_S3_BUCKET }}/static/flows/
 
   # The database changelog. See https://docs.liquibase.com/concepts/changelogs/working-with-changelogs.html
-  LIQUIBASE_COMMAND_CHANGELOG_FILE: "aircraft_changelog.xml"
+  LIQUIBASE_COMMAND_CHANGELOG_FILE: "root.yaml"
 
   # Location of the Quality Checks settings file
   LIQUIBASE_COMMAND_CHECKS_SETTINGS_FILE: s3://${{ secrets.AWS_S3_BUCKET }}/static/checks/liquibase.checks-settings.conf
@@ -48,9 +48,6 @@ env:
   LIQUIBASE_COMMAND_USERNAME: ${{ secrets.LIQUIBASE_USERNAME }}
   LIQUIBASE_COMMAND_PASSWORD: ${{ secrets.LIQUIBASE_PASSWORD }}
 
-  # Disable sending data to Liquibase Hub
-  LIQUIBASE_HUB_MODE: off
-
   # Token for accessing JFrog Artifactory to upload/download artifacts
   # See https://www.jfrog.com/confluence/display/JFROG/Access+Tokens
   ARTIFACTORY_BEARER_TOKEN: ${{ secrets.ARTIFACTORY_BEARER_TOKEN }}
@@ -61,6 +58,7 @@ env:
   # AWS Access credentials use by the Liquibase Pro S3 Extension
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
 
   # Default AWS region
   AWS_REGION: us-east-1
@@ -139,15 +137,15 @@ jobs:
 ####################################################################
 #  Artifact upload
 ####################################################################
-  upload-artifact:
-    needs: [create-artifact]
-    runs-on: [self-hosted]
-    environment: DEV
-
-    steps:
-      # Upload the artifact to JFrog
-      - name: Archive artifact
-        run: |
-          curl -H "Authorization: Bearer ${{ env.ARTIFACTORY_BEARER_TOKEN }}"  -X PUT \
-               "${{ env.ARTIFACTORY_URI_PREFIX }}SNAPSHOT-artifact-${{ github.run_id }}.${{ github.run_number }}.zip" \
-               -T release.zip
+#  upload-artifact:
+#    needs: [create-artifact]
+#    runs-on: [self-hosted]
+#    environment: DEV
+#
+#    steps:
+#      # Upload the artifact to JFrog
+#      - name: Archive artifact
+#        run: |
+#          curl -H "Authorization: Bearer ${{ env.ARTIFACTORY_BEARER_TOKEN }}"  -X PUT \
+#               "${{ env.ARTIFACTORY_URI_PREFIX }}SNAPSHOT-artifact-${{ github.run_id }}.${{ github.run_number }}.zip" \
+#               -T release.zip
