@@ -18,9 +18,6 @@ env:
   # AWS S3 bucket is the host part of the S3 bucket
   AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
 
-#  # AWS S3 Prefix is the path to the S3 folder where flows and check settings are stored
-#  AWS_S3_URI: s3://${{ secrets.AWS_S3_BUCKET }}/static
-
   # The top level Flow File that orchestrates the database changes
   FLOW_FILE: s3://${{ secrets.AWS_S3_BUCKET }}/static/flows/validate-changes-update-db.yaml
 
@@ -55,6 +52,13 @@ env:
 
   # Default AWS region
   AWS_REGION: us-east-1
+  
+  # Logging settings
+  LIQUIBASE_REPORTS_ENABLED: true
+  LIQUIBASE_REPORTS_PATH: reports
+  LIQUIBASE_SHOW_BANNER: false
+  LIQUIBASE_LOG_FORMAT: JSON_PRETTY
+  LIQUIBASE_LOG_FILE: logs/log.json
 
 jobs:
 ####################################################################
@@ -126,19 +130,3 @@ jobs:
         with:
           name: SNAPSHOT-artifact-${{ github.run_id }}.${{ github.run_number }}.zip
           path: release.zip
-
-####################################################################
-#  Artifact upload
-####################################################################
-#  upload-artifact:
-#    needs: [create-artifact]
-#    runs-on: [self-hosted]
-#    environment: DEV
-#
-#    steps:
-#      # Upload the artifact to JFrog
-#      - name: Archive artifact
-#        run: |
-#          curl -H "Authorization: Bearer ${{ env.ARTIFACTORY_BEARER_TOKEN }}"  -X PUT \
-#               "${{ env.ARTIFACTORY_URI_PREFIX }}SNAPSHOT-artifact-${{ github.run_id }}.${{ github.run_number }}.zip" \
-#               -T release.zip
