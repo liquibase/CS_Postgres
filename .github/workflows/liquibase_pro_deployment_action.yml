@@ -66,7 +66,7 @@ jobs:
 
     steps:
       # Clean the workspace to help clean up self-Hosted runners prior to deployment
-      - uses: AutoModality/action-clean@v1
+      #- uses: AutoModality/action-clean@v1
 
       # Download the artifact from JFrog
       # - name: Download artifact into a new directory named artifact
