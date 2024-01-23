@@ -65,13 +65,9 @@ env:
   # See https://docs.liquibase.com/workflows/liquibase-pro/how-to-apply-your-liquibase-pro-license-key.html
   LIQUIBASE_LICENSE_KEY: ${{ secrets.LIQUIBASE_PRO_LICENSE_KEY }}
 
-  # Disable sending data to Liquibase Hub which is not used for this demo
-  # See https://docs.liquibase.com/tools-integrations/liquibase-hub/properties.html
-  LIQUIBASE_HUB_MODE: off
-
   # Default schema: Specified to allow flexibility in storage of Liquibase Change Tracking Tables
   # See https://docs.liquibase.com/parameters/liquibase-schema-name.html
-  LIQUIBASE_LIQUIBASE_SCHEMA_NAME: SYSTEM
+  LIQUIBASE_LIQUIBASE_SCHEMA_NAME: abc
 
 jobs:
   #########################################################################
@@ -95,6 +91,6 @@ jobs:
           liquibase \
              ${{ inputs.global-arguments}} \
              --log-level=${{ inputs.log-level}} \
-             --changelog-file=aircraft_changelog.xml \
+             --changelog-file=root.yaml \
              ${{ inputs.command }} \
              ${{ inputs.command-arguments }}
