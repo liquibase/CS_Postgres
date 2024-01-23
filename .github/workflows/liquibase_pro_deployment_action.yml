@@ -91,6 +91,7 @@ jobs:
       - name: Unzip artifact
         run: |
           unzip artifact.zip -d ./artifact
+          unzip artifact/release.zip -d ./artifact
           du -ah
   ####################################################################
   #  Deploy the artifact to the requested environment
@@ -110,5 +111,5 @@ jobs:
         run: |
           liquibase \
              --log-level=${{ inputs.log-level || 'SEVERE' }} \
-             --changelog-file=./artifact/src/main/resources/changelogs/aircraft_changelog.xml \
+             --changelog-file=./artifact/src/main/resources/changelogs/root.yaml \
              update 
