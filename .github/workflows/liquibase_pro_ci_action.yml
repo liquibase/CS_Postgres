@@ -48,13 +48,6 @@ env:
   LIQUIBASE_COMMAND_USERNAME: ${{ secrets.LIQUIBASE_USERNAME }}
   LIQUIBASE_COMMAND_PASSWORD: ${{ secrets.LIQUIBASE_PASSWORD }}
 
-  # Token for accessing JFrog Artifactory to upload/download artifacts
-  # See https://www.jfrog.com/confluence/display/JFROG/Access+Tokens
-  ARTIFACTORY_BEARER_TOKEN: ${{ secrets.ARTIFACTORY_BEARER_TOKEN }}
-
-  # URI Prefix to JFrog Artifactory where artifacts are uploaded/downloaded
-  ARTIFACTORY_URI_PREFIX: ${{ secrets.ARTIFACTORY_URI_PREFIX }}
-
   # AWS Access credentials use by the Liquibase Pro S3 Extension
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

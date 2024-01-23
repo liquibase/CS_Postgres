@@ -70,3 +70,22 @@ jobs:
              --log-level=${{ inputs.log-level || 'SEVERE' }} \
              --changelog-file=root.yaml \
              update
+       
+####################################################################
+#  Artifact creation for Reports
+####################################################################
+  create-reports-artifact:
+    needs: [database-change-flow]
+    runs-on: [self-hosted]
+    environment: ${{ inputs.environment }}
+
+    steps:
+      # Zip the source into a file called release.zip
+      - name: zip
+        run: zip -r Reports/reports.zip .
+
+      # Upload a copy to GHA for auditability
+      - uses: actions/upload-artifact@v3
+        with:
+          name: REPORTS-${{ github.run_id }}.${{ github.run_number }}.zip
+          path: Reports/reports.zip
