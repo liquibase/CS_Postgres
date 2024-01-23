@@ -80,12 +80,8 @@ jobs:
     environment: ${{ inputs.environment }}
 
     steps:
-      # Zip the source into a file called release.zip
-      - name: zip
-        run: zip -r Reports/reports.zip .
-
-      # Upload a copy to GHA for auditability
-      - uses: actions/upload-artifact@v3
+      # Save reports as artifact
+      - uses: actions/upload-artifact@v4
         with:
-          name: REPORTS-${{ github.run_id }}.${{ github.run_number }}.zip
-          path: Reports/reports.zip
+          name: REPORTS-${{ github.run_id }}.${{ github.run_number }}
+          path: Reports/
