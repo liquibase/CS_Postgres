@@ -137,15 +137,15 @@ jobs:
 ####################################################################
 #  Artifact upload
 ####################################################################
-  upload-artifact:
-    needs: [create-artifact]
-    runs-on: [self-hosted]
-    environment: DEV
-
-    steps:
-      # Upload the artifact to JFrog
-      - name: Archive artifact
-        run: |
-          curl -H "Authorization: Bearer ${{ env.ARTIFACTORY_BEARER_TOKEN }}"  -X PUT \
-               "${{ env.ARTIFACTORY_URI_PREFIX }}SNAPSHOT-artifact-${{ github.run_id }}.${{ github.run_number }}.zip" \
-               -T release.zip
+#  upload-artifact:
+#    needs: [create-artifact]
+#    runs-on: [self-hosted]
+#    environment: DEV
+#
+#    steps:
+#      # Upload the artifact to JFrog
+#      - name: Archive artifact
+#        run: |
+#          curl -H "Authorization: Bearer ${{ env.ARTIFACTORY_BEARER_TOKEN }}"  -X PUT \
+#               "${{ env.ARTIFACTORY_URI_PREFIX }}SNAPSHOT-artifact-${{ github.run_id }}.${{ github.run_number }}.zip" \
+#               -T release.zip
