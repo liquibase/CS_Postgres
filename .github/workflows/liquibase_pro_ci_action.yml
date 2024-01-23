@@ -28,7 +28,7 @@ env:
   LIQUIBASE_SEARCH_PATH: src/main/resources/changelogs,s3://${{ secrets.AWS_S3_BUCKET }}/static/flows/
 
   # The database changelog. See https://docs.liquibase.com/concepts/changelogs/working-with-changelogs.html
-  LIQUIBASE_COMMAND_CHANGELOG_FILE: "aircraft_changelog.xml"
+  LIQUIBASE_COMMAND_CHANGELOG_FILE: "root.yaml"
 
   # Location of the Quality Checks settings file
   LIQUIBASE_COMMAND_CHECKS_SETTINGS_FILE: s3://${{ secrets.AWS_S3_BUCKET }}/static/checks/liquibase.checks-settings.conf
@@ -47,9 +47,6 @@ env:
   # Credentials for the environment's database https://docs.liquibase.com/parameters/command-parameters.html
   LIQUIBASE_COMMAND_USERNAME: ${{ secrets.LIQUIBASE_USERNAME }}
   LIQUIBASE_COMMAND_PASSWORD: ${{ secrets.LIQUIBASE_PASSWORD }}
-
-  # Disable sending data to Liquibase Hub
-  LIQUIBASE_HUB_MODE: off
 
   # Token for accessing JFrog Artifactory to upload/download artifacts
   # See https://www.jfrog.com/confluence/display/JFROG/Access+Tokens
