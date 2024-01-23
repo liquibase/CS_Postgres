@@ -132,8 +132,7 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: SNAPSHOT-artifact-${{ github.run_id }}.${{ github.run_number }}.zip
-          #path: release.zip
-          path: *.*
+          path: release.zip
 
 ####################################################################
 #  Artifact upload
