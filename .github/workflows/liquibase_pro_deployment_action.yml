@@ -75,7 +75,7 @@ jobs:
 #  Artifact creation for Reports
 ####################################################################
   create-reports-artifact:
-    needs: [database-change-flow]
+    needs: [database-deploy]
     runs-on: [self-hosted]
     environment: ${{ inputs.environment }}
 
