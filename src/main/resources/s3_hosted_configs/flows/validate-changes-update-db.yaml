@@ -36,7 +36,7 @@ stages:
     actions:
       - type: liquibase
         command: tag
-        cmdArgs: {tag: "${{ github.run_id }}.${{ github.run_number }}"}
+        cmdArgs: {tag: "${LB_BUILD}"}
 
   liquibaseUpdate:
     # Run Update on Latest Repo State

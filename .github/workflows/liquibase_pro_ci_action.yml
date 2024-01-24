@@ -30,8 +30,9 @@ env:
   # Location of the Quality Checks settings file
   LIQUIBASE_COMMAND_CHECKS_SETTINGS_FILE: s3://${{ secrets.AWS_S3_BUCKET }}/static/checks/liquibase.checks-settings.conf
 
-  # Pass an environment to the flow to control actions specific only to certain environments
-  LIQUIBASE_FLOW_ENV: DEV
+  # Flow environment variables. Use 'LB' instead of 'LIQUIBASE' to avoid warning.
+  LB_FLOW_ENV: DEV
+  LB_BUILD: ${{ github.run_id }}.${{ github.run_number }}
 
   # Pro License key
   # See https://docs.liquibase.com/workflows/liquibase-pro/how-to-apply-your-liquibase-pro-license-key.html
