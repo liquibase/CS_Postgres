@@ -69,7 +69,7 @@ env:
   #LIQUIBASE_SEARCH_PATH: '.'
 
   # The database changelog. See https://docs.liquibase.com/concepts/changelogs/working-with-changelogs.html
-  LIQUIBASE_COMMAND_CHANGELOG_FILE: "./artifact/src/main/resources/changelogs/root.yaml"
+  LIQUIBASE_COMMAND_CHANGELOG_FILE: "artifact/src/main/resources/changelogs/root.yaml"
 
   # Location of the Quality Checks settings file
   LIQUIBASE_COMMAND_CHECKS_SETTINGS_FILE: s3://${{ secrets.AWS_S3_BUCKET }}/static/checks/liquibase.checks-settings.conf
