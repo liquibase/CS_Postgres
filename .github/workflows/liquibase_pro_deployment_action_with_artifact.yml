@@ -4,7 +4,7 @@
 #  Custom Quality checks and S3.
 #####################################################################
 name: 'Liquibase Pro Deployment Job with Artifact'
-run-name: ${{ inputs.environment}} deployment of ${{ inputs.artifact-version }} by ${{ github.actor }}
+run-name: ${{ inputs.environment}} deployment of ${{ inputs.artifact-id }} by ${{ github.actor }}
 
 on:
 
@@ -16,10 +16,11 @@ on:
         description: 'Environment to deploy to'
         type: environment
         required: true
-      # This is a text input for the version of the artifact to pull from Artifactory
-      # and use for the deployment. The form is MMMMMMMMM.mm
-      artifact-version:
-        description: 'Artifact version to deploy:'
+      # This is a text input for the artifact id to pull from GitHub artifacts
+      # Copy and paste the URL to the artifact. Artifact ID will be parsed from URL. 
+      # Or specify the artifact id.
+      artifact-id:
+        description: 'Artifact id to deploy:'
         required: true
         type: string
       # For more info on log level, see: https://docs.liquibase.com/parameters/log-level.html
@@ -34,9 +35,20 @@ on:
 #  Set up the environment
 #####################################################################
 env:
-  # Search path (See https://docs.liquibase.com/concepts/changelogs/how-liquibase-finds-files.html)
-  LIQUIBASE_SEARCH_PATH: '.'
+    # AWS S3 bucket is the host part of the S3 bucket
+  AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+  
+  # AWS Access credentials use by the Liquibase Pro S3 Extension
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
+  # Default AWS region
+  AWS_REGION: us-east-1
+  
+  # Pro License key
+  # See https://docs.liquibase.com/workflows/liquibase-pro/how-to-apply-your-liquibase-pro-license-key.html
+  LIQUIBASE_LICENSE_KEY: ${{ secrets.LIQUIBASE_PRO_LICENSE_KEY }}
+  
   # JDBC URL of the database per environment
   # See https://docs.liquibase.com/workflows/liquibase-community/using-jdbc-url-in-liquibase.html
   LIQUIBASE_COMMAND_URL: ${{ secrets.LIQUIBASE_URL }}
@@ -44,17 +56,30 @@ env:
   # Credentials for the environment's database https://docs.liquibase.com/parameters/command-parameters.html
   LIQUIBASE_COMMAND_USERNAME: ${{ secrets.LIQUIBASE_USERNAME }}
   LIQUIBASE_COMMAND_PASSWORD: ${{ secrets.LIQUIBASE_PASSWORD }}
-
-  # Pro License key
-  # See https://docs.liquibase.com/workflows/liquibase-pro/how-to-apply-your-liquibase-pro-license-key.html
-  LIQUIBASE_LICENSE_KEY: ${{ secrets.LIQUIBASE_PRO_LICENSE_KEY }}
   
   # Liquibase schema: Specified to allow flexibility in storage of Liquibase Change Tracking Tables
   # See https://docs.liquibase.com/parameters/liquibase-schema-name.html
   LIQUIBASE_LIQUIBASE_SCHEMA_NAME: abc
   
   # Default schema: Specify schema for all changes
-  LIQUIBASE_DEFAULT_SCHEMA_NAME: abc
+  LIQUIBASE_COMMAND_DEFAULT_SCHEMA_NAME: abc
+
+  # Search path (See https://docs.liquibase.com/concepts/changelogs/how-liquibase-finds-files.html)
+  LIQUIBASE_SEARCH_PATH: src/main/resources/changelogs,s3://${{ secrets.AWS_S3_BUCKET }}/static/flows/
+  #LIQUIBASE_SEARCH_PATH: '.'
+
+  # The database changelog. See https://docs.liquibase.com/concepts/changelogs/working-with-changelogs.html
+  LIQUIBASE_COMMAND_CHANGELOG_FILE: "./artifact/src/main/resources/changelogs/root.yaml"
+
+  # Location of the Quality Checks settings file
+  LIQUIBASE_COMMAND_CHECKS_SETTINGS_FILE: s3://${{ secrets.AWS_S3_BUCKET }}/static/checks/liquibase.checks-settings.conf
+
+  # The top level Flow File that orchestrates the database changes. Use 'LB' instead of 'LIQUIBASE' to avoid warning.
+  LB_FLOW_FILE: s3://${{ secrets.AWS_S3_BUCKET }}/static/flows/deploy-changes-update-db.yaml
+
+  # Flow environment variables. Use 'LB' instead of 'LIQUIBASE' to avoid warning.
+  LB_FLOW_ENV: ${{ inputs.environment }}
+  LB_DEPLOYMENT: ${{ github.run_id }}.${{ github.run_number }}
   
   # Logging settings
   LIQUIBASE_REPORTS_ENABLED: true
@@ -62,6 +87,7 @@ env:
   LIQUIBASE_SHOW_BANNER: false
   LIQUIBASE_LOG_FORMAT: JSON_PRETTY
   LIQUIBASE_LOG_FILE: logs/log.json
+  LIQUIBASE_LOG_LEVEL: ${{ inputs.log-level || 'SEVERE' }}
 
 jobs:
   ####################################################################
@@ -79,7 +105,7 @@ jobs:
       - name: Download artifact into a new directory named artifact
         run: |
           mkdir ./artifact
-          ARTIFACT_ID=$(echo ${{ inputs.artifact-version }}|grep -P '[0-9]+' -o | tail -1)
+          ARTIFACT_ID=$(echo ${{ inputs.artifact-id }}|grep -P '[0-9]+' -o | tail -1)
           curl -L -o artifact.zip \
             -H "Accept: application/vnd.github+json" \
             -H "Authorization: Bearer ${{ secrets.GH_PAT }}" \
@@ -107,12 +133,11 @@ jobs:
     # we've specified a logicalFilePath which is used as a key to the correct file, regardless of
     # where it resides on the file system
     steps:
-      - name: Run liquibase update command
+        # Execute the Flow file
+      - name: Run flow
         run: |
-          liquibase \
-             --log-level=${{ inputs.log-level || 'SEVERE' }} \
-             --changelog-file=./artifact/src/main/resources/changelogs/root.yaml \
-             update 
+          liquibase flow \
+             --flow-file=${{ env.LB_FLOW_FILE }}               
 
 ####################################################################
 #  Artifact creation for Reports

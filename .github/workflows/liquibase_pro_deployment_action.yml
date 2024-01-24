@@ -4,7 +4,7 @@
 #  Custom Quality checks and S3.
 #####################################################################
 name: 'Liquibase Pro Deployment Job'
-run-name: ${{ inputs.environment}} deployment of ${{ inputs.artifact-version }} by ${{ github.actor }}
+run-name: ${{ inputs.environment}} deployment of current repo by ${{ github.actor }}
 
 on:
 
