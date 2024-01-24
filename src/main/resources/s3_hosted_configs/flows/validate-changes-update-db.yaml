@@ -30,13 +30,16 @@ stages:
             checks-settings-file: "s3://${AWS_S3_BUCKET}/static/checks/liquibase.checks-settings.conf"
           }
 
-  tagDatabase:
+  tagDatabaseBegin:
     # Tag database current state
     # See https://docs.liquibase.com/commands/change-tracking/tag.html
     actions:
       - type: liquibase
         command: tag
-        cmdArgs: {tag: "${LB_BUILD}"}
+        cmdArgs: 
+          { tag: "${LB_BUILD}-begin",
+            add-row: "true"
+          }
 
   liquibaseUpdate:
     # Run Update on Latest Repo State
@@ -51,6 +54,17 @@ stages:
       - type: liquibase
         command: update
         cmdArgs: { }
+        
+  tagDatabaseEnd:
+    # Tag database current state
+    # See https://docs.liquibase.com/commands/change-tracking/tag.html
+    actions:
+      - type: liquibase
+        command: tag
+        cmdArgs: 
+          { tag: "${LB_BUILD}-end",
+            add-row: "true"
+          }
 
   endStage:
     actions:
