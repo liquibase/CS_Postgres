@@ -48,7 +48,6 @@ env:
   # AWS Access credentials use by the Liquibase Pro S3 Extension
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  #AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
 
   # Default AWS region
   AWS_REGION: us-east-1
@@ -102,17 +101,6 @@ jobs:
              --flow-file=s3://${{ env.AWS_S3_BUCKET }}/static/flows/validate-changes-update-db.yaml
 
 ####################################################################
-#  Execute database integration tests here
-####################################################################
-#  integration-tests:
-#    needs: [ checkout-repo,  database-change-flow ]
-#    runs-on: [ self-hosted ]
-#    environment: ${{ inputs.environment || 'DEV' }}
-#
-#    steps:
-#      # Integration tests...
-
-####################################################################
 #  Artifact creation
 ####################################################################
   create-artifact:
@@ -121,10 +109,6 @@ jobs:
     environment: DEV
 
     steps:
-      # Zip the source into a file called release.zip
-      #- name: zip
-      #  run: zip -r release.zip .
-
       # Upload a copy to GHA for auditability
       - uses: actions/upload-artifact@v3
         with:

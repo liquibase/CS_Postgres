@@ -30,14 +30,13 @@ stages:
             checks-settings-file: "s3://${AWS_S3_BUCKET}/static/checks/liquibase.checks-settings.conf"
           }
 
-  generateUpdateInfo:
+  tagDatabase:
+    # Tag database current state
+    # See https://docs.liquibase.com/commands/change-tracking/tag.html
     actions:
       - type: liquibase
-        # Run everywhere but DEV
-        if: "${LIQUIBASE_FLOW_ENV} != DEV"
-        # https://docs.liquibase.com/commands/flow/flow.html
-        command: flow
-        cmdArgs: {flow-file: "./generate-update-info.yaml"}
+        command: tag
+        cmdArgs: {tag: "${{ github.run_id }}.${{ github.run_number }}"}
 
   liquibaseUpdate:
     # Run Update on Latest Repo State
