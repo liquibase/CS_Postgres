@@ -64,7 +64,7 @@ stages:
             add-row: "true"
           }
 
-  endStage:
+endStage:
     actions:
       # Run Checks on Database
       # https://docs.liquibase.com/commands/quality-checks/subcommands/run.html

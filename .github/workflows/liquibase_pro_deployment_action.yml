@@ -66,7 +66,7 @@ env:
   # Location of the Quality Checks settings file
   LIQUIBASE_COMMAND_CHECKS_SETTINGS_FILE: s3://${{ secrets.AWS_S3_BUCKET }}/static/checks/liquibase.checks-settings.conf
 
-  # The top level Flow File that orchestrates the database changes
+  # The top level Flow File that orchestrates the database changes. Use 'LB' instead of 'LIQUIBASE' to avoid warning.
   LB_FLOW_FILE: s3://${{ secrets.AWS_S3_BUCKET }}/static/flows/deploy-changes-update-db.yaml
 
   # Flow environment variables. Use 'LB' instead of 'LIQUIBASE' to avoid warning.
