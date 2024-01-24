@@ -1,4 +1,4 @@
-# validate-changes-update-db.yaml
+# deploy-changes-update-db.yaml
 # Description:
 #   This flow runs several Liquibase commands to generate information that could be useful for review, auditing
 #   and troubleshooting purposes.  It will run in all shared pipeline environments from CI onward.
@@ -18,15 +18,7 @@ stages:
         command: status
         cmdArgs: { changelog-file: "${LIQUIBASE_COMMAND_CHANGELOG_FILE}", verbose: "true" }
 
-      # Run Checks on Repo Changelog
-      # https://docs.liquibase.com/commands/quality-checks/subcommands/run.html
-      - type: liquibase
-        command: checks run
-        cmdArgs:
-          { changelog-file: "${LIQUIBASE_COMMAND_CHANGELOG_FILE}",
-            checks-scope: "changelog",
-            checks-settings-file: "s3://${AWS_S3_BUCKET}/static/checks/liquibase.checks-settings.conf"
-          }
+      # Quality Checks were run in CI build
 
   tagDatabaseBegin:
     # Tag database current state
@@ -35,7 +27,7 @@ stages:
       - type: liquibase
         command: tag
         cmdArgs: 
-          { tag: "${LB_BUILD}-begin",
+          { tag: "${LB_DEPLOYMENT}-begin",
             add-row: "true"
           }
 
@@ -60,7 +52,7 @@ stages:
       - type: liquibase
         command: tag
         cmdArgs: 
-          { tag: "${LB_BUILD}-end",
+          { tag: "${LB_DEPLOYMENT}-end",
             add-row: "true"
           }
 
