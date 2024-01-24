@@ -116,7 +116,6 @@ jobs:
       - name: Unzip artifact
         run: |
           unzip artifact.zip -d ./artifact
-          unzip artifact/release.zip -d ./artifact
           du -ah
           
   ####################################################################
