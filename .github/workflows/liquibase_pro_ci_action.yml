@@ -42,7 +42,7 @@ env:
   LIQUIBASE_LIQUIBASE_SCHEMA_NAME: abc
   
   # Default schema: Specify schema for all changes
-  LIQUIBASE_DEFAULT_SCHEMA_NAME: abc
+  LIQUIBASE_COMMAND_DEFAULT_SCHEMA_NAME: abc
 
   # Search path (See https://docs.liquibase.com/concepts/changelogs/how-liquibase-finds-files.html)
   LIQUIBASE_SEARCH_PATH: src/main/resources/changelogs,s3://${{ secrets.AWS_S3_BUCKET }}/static/flows/
