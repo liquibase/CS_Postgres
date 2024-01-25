@@ -61,19 +61,9 @@ env:
 
   # The database changelog. See https://docs.liquibase.com/concepts/changelogs/working-with-changelogs.html
   LIQUIBASE_COMMAND_CHANGELOG_FILE: "root.yaml"
-
-  # Location of the Quality Checks settings file
-  LIQUIBASE_COMMAND_CHECKS_SETTINGS_FILE: s3://${{ secrets.AWS_S3_BUCKET }}/static/checks/liquibase.checks-settings.conf
   
   # Location where to store snapshot
   LIQUIBASE_OUTPUT_FILE: s3://${{ secrets.AWS_S3_BUCKET }}/snapshots/${{ inputs.environment }}-snapshot.json
-
-  # The top level Flow File that orchestrates the database changes. Use 'LB' instead of 'LIQUIBASE' to avoid warning.
-  LB_FLOW_FILE: s3://${{ secrets.AWS_S3_BUCKET }}/static/flows/deploy-changes-update-db.yaml
-
-  # Flow environment variables. Use 'LB' instead of 'LIQUIBASE' to avoid warning.
-  LB_FLOW_ENV: ${{ inputs.environment }}
-  LB_DEPLOYMENT: ${{ github.run_id }}.${{ github.run_number }}
   
   # Logging settings
   LIQUIBASE_REPORTS_ENABLED: true
@@ -101,7 +91,7 @@ jobs:
         uses: actions/checkout@v3
         
         # Execute the Flow file
-      - name: Run flow
+      - name: Take snapshot
         run: |
           liquibase snapshot --snapshot-format=json
              
