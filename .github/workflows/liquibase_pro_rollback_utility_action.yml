@@ -44,7 +44,13 @@ on:
       rollback-one-changeset:
         description: '3-rollback-one-changeset <author>,<id>,<path>:'
         required: false
-        type: string 
+        type: string
+ 
+      # 4-rollback-one-update parameters. See https://docs.liquibase.com/parameters/command-parameters.html
+      rollback-one-update:
+        description: '4-rollback-one-update <deployment_id>:'
+        required: false
+        type: string
         
       # For more info on log level, see: https://docs.liquibase.com/parameters/log-level.html     
       log-level:
@@ -116,6 +122,7 @@ env:
   
   # 4-Rollback one update environment variables
   # Need Parameter Support. Currently rolls back last deployment.
+  LIQUIBASE_DEPLOYMENT_ID: ${{ inputs.rollback-one-update}}
   
   # Logging settings
   LIQUIBASE_REPORTS_ENABLED: true
@@ -154,7 +161,9 @@ jobs:
           ROLLBACK_COMMAND=$(echo ${{ inputs.command }}|grep -P '[0-9]-.*' -o | cut -c 3-)
           liquibase \
             $ROLLBACK_COMMAND \
-            --force                       
+            --force
+            
+                   
        
 ###############################################################################
 #  Artifact creation for Reports - For Use when Rollback Report is available
