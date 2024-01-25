@@ -35,7 +35,7 @@ stages:
         command: diff
         cmdArgs: 
           { referenceURL: "${LIQUIBASE_COMMAND_REFERENCE_URL}", 
-            format: json
+            format: "json"
           }
   
   tagDatabaseBegin:
