@@ -26,18 +26,25 @@ on:
         required: true
         default: 'status'
         type: choice
-        options: ['rollback','rollback-count','rollback-one-changeset','rollback-one-update','rollback-to-date']
+        options: ['1-rollback','2-rollback-count','3-rollback-one-changeset','4-rollback-one-update','5-rollback-to-date']
       # Command parameters. See https://docs.liquibase.com/parameters/command-parameters.html
-      command-arguments:
-        description:  'Rollback Command arguments:'
-        required: false
-        type: string
+      # command-arguments:
+        # description:  'Rollback Command arguments:'
+        # required: false
+        # type: string
       # Global parameters. See https://docs.liquibase.com/parameters/command-parameters.html
-      global-arguments:
-        description: 'Global Arguments:'
+      # global-arguments:
+        # description: 'Global Arguments:'
+        # required: false
+        # type: string
+
+      # 1-rollback parameters. See https://docs.liquibase.com/parameters/command-parameters.html
+      1-rollback tagName:
+        description: '1-rollback TagName:'
         required: false
         type: string
-      # For more info on log level, see: https://docs.liquibase.com/parameters/log-level.html
+        
+      # For more info on log level, see: https://docs.liquibase.com/parameters/log-level.html     
       log-level:
         description: 'Liquibase log level'
         required: false
@@ -118,10 +125,10 @@ jobs:
         uses: actions/checkout@v3
         
         # Execute the Flow file
-      - name: Run flow
-        run: |
-          liquibase flow \
-             --flow-file=${{ env.LB_FLOW_FILE }}
+      # - name: Run flow
+        # run: |
+          # liquibase flow \
+             # --flow-file=${{ env.LB_FLOW_FILE }}
              
       - name: Run liquibase command
         run: |
