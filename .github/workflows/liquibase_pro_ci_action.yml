@@ -64,6 +64,9 @@ env:
   # See https://docs.liquibase.com/tools-integrations/observability/operation-reports-drift-report.html
   LIQUIBASE_COMMAND_REFERENCE_URL: "offline:postgres?snapshot=DEV-snapshot.json"
   
+  # Location where to store snapshot
+  LIQUIBASE_OUTPUT_FILE: s3://${{ secrets.AWS_S3_BUCKET }}/snapshots/DEV-snapshot.json
+  
   # Logging settings
   LIQUIBASE_REPORTS_ENABLED: true
   LIQUIBASE_REPORTS_PATH: reports

@@ -73,6 +73,16 @@ stages:
           { tag: "${LB_BUILD}-end",
             add-row: "true"
           }
+    
+  newSnapshot:
+    # Upload a new snapshot
+    actions:
+      - type: liquibase
+        command: snapshot
+        cmdArgs: 
+          { referenceURL: "${LIQUIBASE_COMMAND_REFERENCE_URL}", 
+            format: json
+          }
 
 endStage:
     actions:
