@@ -29,6 +29,10 @@ databaseChangeLog:
   - include:
       file: test_table_03.sql
       relativeToChangeLogFile: true
+      
+  - include:
+      file: test_table_04.sql
+      relativeToChangeLogFile: true
 
 # DATA FILES  
   - include:
