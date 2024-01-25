@@ -45,7 +45,7 @@ stages:
       - type: liquibase
         command: tag
         cmdArgs: 
-          { tag: "${LB_DEPLOYMENT}-begin",
+          { tag: "${LB_DEPLOYMENT}",
             add-row: "true"
           }
 
@@ -62,17 +62,6 @@ stages:
       - type: liquibase
         command: update
         cmdArgs: { }
-        
-  tagDatabaseEnd:
-    # Tag database current state
-    # See https://docs.liquibase.com/commands/change-tracking/tag.html
-    actions:
-      - type: liquibase
-        command: tag
-        cmdArgs: 
-          { tag: "${LB_DEPLOYMENT}-end",
-            add-row: "true"
-          }
     
   newSnapshot:
     # Upload a new snapshot

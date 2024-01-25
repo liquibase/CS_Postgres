@@ -27,7 +27,7 @@ stages:
             checks-scope: "changelog",
             checks-settings-file: "s3://${AWS_S3_BUCKET}/static/checks/liquibase.checks-settings.conf"
           }
- 
+
   driftDetection:
     # Check if manual updates were made to the environment since last deployment
     actions:
@@ -37,7 +37,7 @@ stages:
           { referenceURL: "${LIQUIBASE_COMMAND_REFERENCE_URL}", 
             format: json
           }
-
+  
   tagDatabaseBegin:
     # Tag database current state
     # See https://docs.liquibase.com/commands/change-tracking/tag.html
@@ -45,7 +45,7 @@ stages:
       - type: liquibase
         command: tag
         cmdArgs: 
-          { tag: "${LB_BUILD}-begin",
+          { tag: "${LB_BUILD}",
             add-row: "true"
           }
 
@@ -62,17 +62,6 @@ stages:
       - type: liquibase
         command: update
         cmdArgs: { }
-        
-  tagDatabaseEnd:
-    # Tag database current state
-    # See https://docs.liquibase.com/commands/change-tracking/tag.html
-    actions:
-      - type: liquibase
-        command: tag
-        cmdArgs: 
-          { tag: "${LB_BUILD}-end",
-            add-row: "true"
-          }
     
   newSnapshot:
     # Upload a new snapshot
