@@ -26,19 +26,25 @@ on:
         required: true
         default: 'status'
         type: choice
-        options: ['1-rollback','2-rollback-count','3-rollback-one-changeset','4-rollback-one-update','5-rollback-to-date']
+        options: ['1-rollback','2-rollback-count','3-rollback-one-changeset','4-rollback-one-update']
 
       # 1-rollback parameters. See https://docs.liquibase.com/parameters/command-parameters.html
       rollback-tag-name:
-        description: '1-rollback tag name:'
+        description: '1-rollback <tag>:'
         required: false
         type: string
       
       # 2-rollback-count parameters. See https://docs.liquibase.com/parameters/command-parameters.html
       rollback-count:
-        description: '2-count number:'
+        description: '2-rollback count <number>:'
         required: false
         type: string
+        
+      # 3-rollback-one-changeset parameters. See https://docs.liquibase.com/parameters/command-parameters.html
+      rollback-one-changeset:
+        description: '3-rollback-one-changeset <author>,<id>,<path>:'
+        required: false
+        type: string 
         
       # For more info on log level, see: https://docs.liquibase.com/parameters/log-level.html     
       log-level:
@@ -100,8 +106,16 @@ env:
   # 1-Rollback environment variables
   LIQUIBASE_COMMAND_TAG: ${{ inputs.rollback-tag-name }}
   
-  # 2-Rollback environment variables
+  # 2-Rollback count environment variables
   LIQUIBASE_COMMAND_COUNT: ${{ inputs.rollback-count}}
+  
+  # 3-Rollback one changeset environment variables
+  LIQUIBASE_COMMAND_CHANGESET_AUTHOR: ${{ inputs.rollback-one-changeset}}
+  LIQUIBASE_COMMAND_CHANGESET_ID: ${{ inputs.rollback-one-changeset}}
+  LIQUIBASE_COMMAND_CHANGESET_PATH: ${{ inputs.rollback-one-changeset}}
+  
+  # 4-Rollback one update environment variables
+  # Need Parameter Support. Currently rolls back last deployment.
   
   # Logging settings
   LIQUIBASE_REPORTS_ENABLED: true
