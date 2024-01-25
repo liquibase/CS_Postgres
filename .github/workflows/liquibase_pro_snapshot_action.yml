@@ -63,7 +63,7 @@ env:
   LIQUIBASE_COMMAND_CHANGELOG_FILE: "root.yaml"
   
   # Location where to store snapshot
-  LIQUIBASE_OUTPUT_FILE: s3://${{ secrets.AWS_S3_BUCKET }}/snapshots/${{ inputs.environment }}-snapshot.json
+  LB_SNAPSHOT_OUTPUT_FILE: s3://${{ secrets.AWS_S3_BUCKET }}/snapshots/${{ inputs.environment }}-snapshot.json
   
   # Logging settings
   LIQUIBASE_REPORTS_ENABLED: true
@@ -93,5 +93,5 @@ jobs:
         # Execute the Flow file
       - name: Take snapshot
         run: |
-          liquibase snapshot --snapshot-format=json
+          liquibase snapshot --snapshot-format=json --output-file=${{ env.LB_SNAPSHOT_OUTPUT_FILE }}
              
