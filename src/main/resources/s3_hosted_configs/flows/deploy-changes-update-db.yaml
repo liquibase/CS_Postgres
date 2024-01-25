@@ -70,8 +70,9 @@ stages:
         command: snapshot
         cmdArgs: 
           { referenceURL: "${LIQUIBASE_COMMAND_REFERENCE_URL}", 
-            snapshot-format: json
+            snapshot-format: json 
           }
+        globalArgs: { outputfile: "${LB_SNAPSHOT_OUTPUT_FILE}" }
 
 endStage:
     actions:

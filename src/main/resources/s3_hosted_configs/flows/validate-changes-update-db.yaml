@@ -69,7 +69,7 @@ stages:
       - type: liquibase
         command: snapshot
         cmdArgs: 
-          { referenceURL: "${LIQUIBASE_COMMAND_REFERENCE_URL}", 
+          { referenceURL: "${LIQUIBASE_COMMAND_REFERENCE_URL}",          
             format: json
           }
 
