@@ -27,20 +27,16 @@ on:
         default: 'status'
         type: choice
         options: ['1-rollback','2-rollback-count','3-rollback-one-changeset','4-rollback-one-update','5-rollback-to-date']
-      # Command parameters. See https://docs.liquibase.com/parameters/command-parameters.html
-      # command-arguments:
-        # description:  'Rollback Command arguments:'
-        # required: false
-        # type: string
-      # Global parameters. See https://docs.liquibase.com/parameters/command-parameters.html
-      # global-arguments:
-        # description: 'Global Arguments:'
-        # required: false
-        # type: string
 
       # 1-rollback parameters. See https://docs.liquibase.com/parameters/command-parameters.html
       1-rollback-tag-name:
         description: '1-rollback tag name:'
+        required: false
+        type: string
+      
+      # 2-rollback-count parameters. See https://docs.liquibase.com/parameters/command-parameters.html
+      2-rollback-count:
+        description: '2-count number:'
         required: false
         type: string
         
@@ -101,9 +97,11 @@ env:
   LB_FLOW_ENV: DEV
   LB_ROLLBACK: ${{ github.run_id }}.${{ github.run_number }}
   
+  # 1-Rollback environment variables
+  LIQUIBASE_COMMAND_TAG: ${{ inputs.1-rollback-tag-name
   
-  # Rollback environment variables
-  LIQUIBASE_COMMAND_TAG: ${{ inputs.1-rollback-tag-name}}
+  # 2-Rollback environment variables
+  LIQUIBASE_COMMAND_COUNT: ${{ inputs.2-rollback-count}}
   
   # Logging settings
   LIQUIBASE_REPORTS_ENABLED: true
