@@ -18,7 +18,15 @@ stages:
         command: status
         cmdArgs: { changelog-file: "${LIQUIBASE_COMMAND_CHANGELOG_FILE}", verbose: "true" }
 
-      # Quality Checks were run in CI build
+      # Run Checks on Repo Changelog
+      # https://docs.liquibase.com/commands/quality-checks/subcommands/run.html
+      - type: liquibase
+        command: checks run
+        cmdArgs:
+          { changelog-file: "${LIQUIBASE_COMMAND_CHANGELOG_FILE}",
+            checks-scope: "changelog",
+            checks-settings-file: "s3://${AWS_S3_BUCKET}/static/checks/liquibase.checks-settings.conf"
+          }
 
   tagDatabaseBegin:
     # Tag database current state
