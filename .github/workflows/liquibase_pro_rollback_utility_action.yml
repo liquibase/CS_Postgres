@@ -98,7 +98,7 @@ env:
   LB_ROLLBACK: ${{ github.run_id }}.${{ github.run_number }}
   
   # 1-Rollback environment variables
-  LIQUIBASE_COMMAND_TAG: ${{ inputs.1-rollback-tag-name
+  LIQUIBASE_COMMAND_TAG: ${{ inputs.1-rollback-tag-name }}
   
   # 2-Rollback environment variables
   LIQUIBASE_COMMAND_COUNT: ${{ inputs.2-rollback-count}}
