@@ -13,8 +13,8 @@ on:
       environment:
         description: 'Environment:'
         type: environment
-        default: development
         required: true
+        
       # Which rollback command to use. See the following:
       #  https://docs.liquibase.com/commands/rollback/rollback-by-tag.html
       #  https://docs.liquibase.com/commands/rollback/rollback-count.html
@@ -26,7 +26,7 @@ on:
         required: true
         default: 'status'
         type: choice
-        options: ['rollback','rollback-count','rollback-one-changeset','rollback-one-update','rollback-to-date','rollback-count-sql']
+        options: ['rollback','rollback-count','rollback-one-changeset','rollback-one-update','rollback-to-date']
       # Command parameters. See https://docs.liquibase.com/parameters/command-parameters.html
       command-arguments:
         description:  'Rollback Command arguments:'
@@ -49,10 +49,20 @@ on:
 #  Set up the environment
 #####################################################################
 env:
+  # AWS S3 bucket is the host part of the S3 bucket
+  AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+  
+  # AWS Access credentials use by the Liquibase Pro S3 Extension
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-  # Search path (See https://docs.liquibase.com/concepts/changelogs/how-liquibase-finds-files.html)
-  LIQUIBASE_SEARCH_PATH: src/main/resources/changelogs
-
+  # Default AWS region
+  AWS_REGION: us-east-1
+  
+  # Pro License key
+  # See https://docs.liquibase.com/workflows/liquibase-pro/how-to-apply-your-liquibase-pro-license-key.html
+  LIQUIBASE_LICENSE_KEY: ${{ secrets.LIQUIBASE_PRO_LICENSE_KEY }}
+  
   # JDBC URL of the database per environment
   # See https://docs.liquibase.com/workflows/liquibase-community/using-jdbc-url-in-liquibase.html
   LIQUIBASE_COMMAND_URL: ${{ secrets.LIQUIBASE_URL }}
@@ -60,21 +70,42 @@ env:
   # Credentials for the environment's database https://docs.liquibase.com/parameters/command-parameters.html
   LIQUIBASE_COMMAND_USERNAME: ${{ secrets.LIQUIBASE_USERNAME }}
   LIQUIBASE_COMMAND_PASSWORD: ${{ secrets.LIQUIBASE_PASSWORD }}
-
-  # Pro License key
-  # See https://docs.liquibase.com/workflows/liquibase-pro/how-to-apply-your-liquibase-pro-license-key.html
-  LIQUIBASE_LICENSE_KEY: ${{ secrets.LIQUIBASE_PRO_LICENSE_KEY }}
-
-  # Default schema: Specified to allow flexibility in storage of Liquibase Change Tracking Tables
+  
+  # Liquibase schema: Specified to allow flexibility in storage of Liquibase Change Tracking Tables
   # See https://docs.liquibase.com/parameters/liquibase-schema-name.html
   LIQUIBASE_LIQUIBASE_SCHEMA_NAME: abc
+  
+  # Default schema: Specify schema for all changes
+  LIQUIBASE_COMMAND_DEFAULT_SCHEMA_NAME: abc
 
+  # Search path (See https://docs.liquibase.com/concepts/changelogs/how-liquibase-finds-files.html)
+  LIQUIBASE_SEARCH_PATH: src/main/resources/changelogs,s3://${{ secrets.AWS_S3_BUCKET }}/static/flows/
+
+  # The database changelog. See https://docs.liquibase.com/concepts/changelogs/working-with-changelogs.html
+  LIQUIBASE_COMMAND_CHANGELOG_FILE: "root.yaml"
+
+  # Location of the Quality Checks settings file
+  LIQUIBASE_COMMAND_CHECKS_SETTINGS_FILE: s3://${{ secrets.AWS_S3_BUCKET }}/static/checks/liquibase.checks-settings.conf
+
+  # The top level Flow File that orchestrates the database changes. Use 'LB' instead of 'LIQUIBASE' to avoid warning.
+  LB_FLOW_FILE: s3://${{ secrets.AWS_S3_BUCKET }}/static/flows/rollback-changes-update-db.yaml
+
+  # Flow environment variables. Use 'LB' instead of 'LIQUIBASE' to avoid warning.
+  LB_FLOW_ENV: DEV
+  LB_ROLLBACK: ${{ github.run_id }}.${{ github.run_number }}
+  
+  # Logging settings
+  LIQUIBASE_REPORTS_ENABLED: true
+  LIQUIBASE_REPORTS_PATH: reports
+  LIQUIBASE_SHOW_BANNER: false
+  LIQUIBASE_LOG_FORMAT: JSON_PRETTY
+  LIQUIBASE_LOG_FILE: logs/log.json
+          
 jobs:
   #########################################################################
-  #  Roll back using the changelog from the artifact
+  #  Rollback using repo
   #########################################################################
-
-  liquibase-rollback-action:
+  database-rollback:
     runs-on: [self-hosted]
     environment: ${{ inputs.environment }}
 
@@ -85,7 +116,13 @@ jobs:
         # Check out the source code
       - name: Checkout repo
         uses: actions/checkout@v3
-
+        
+        # Execute the Flow file
+      - name: Run flow
+        run: |
+          liquibase flow \
+             --flow-file=${{ env.LB_FLOW_FILE }}
+             
       - name: Run liquibase command
         run: |
           liquibase \
@@ -94,3 +131,19 @@ jobs:
              --changelog-file=root.yaml \
              ${{ inputs.command }} \
              ${{ inputs.command-arguments }}
+                   
+       
+####################################################################
+#  Artifact creation for Reports
+####################################################################
+  create-reports-artifact:
+    needs: [database-rollback]
+    runs-on: [self-hosted]
+    environment: ${{ inputs.environment }}
+
+    steps:
+      # Save reports as artifact
+      - uses: actions/upload-artifact@v3
+        with:
+          name: REPORTS-${{ github.run_id }}.${{ github.run_number }}.zip
+          path: reports/
