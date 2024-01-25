@@ -39,8 +39,8 @@ on:
         # type: string
 
       # 1-rollback parameters. See https://docs.liquibase.com/parameters/command-parameters.html
-      1-rollback tagName:
-        description: '1-rollback TagName:'
+      1-rollback-tag-name:
+        description: '1-rollback tag name:'
         required: false
         type: string
         
@@ -101,6 +101,10 @@ env:
   LB_FLOW_ENV: DEV
   LB_ROLLBACK: ${{ github.run_id }}.${{ github.run_number }}
   
+  
+  # Rollback environment variables
+  LIQUIBASE_COMMAND_TAG: ${{ inputs.1-rollback-tag-name}}
+  
   # Logging settings
   LIQUIBASE_REPORTS_ENABLED: true
   LIQUIBASE_REPORTS_PATH: reports
@@ -136,8 +140,7 @@ jobs:
              ${{ inputs.global-arguments}} \
              --log-level=${{ inputs.log-level}} \
              --changelog-file=root.yaml \
-             ${{ inputs.command }} \
-             ${{ inputs.command-arguments }}
+             rollback
                    
        
 ####################################################################
