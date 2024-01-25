@@ -1,0 +1,27 @@
+# deploy-changes-update-db.yaml
+# Description:
+#   This flow runs several Liquibase commands to generate information that could be useful for review, auditing
+#   and troubleshooting purposes.  It will run in all shared pipeline environments from CI onward.
+
+stages:
+  liquibaseUpdate:
+    # Run Update on Latest Repo State
+    # https://docs.liquibase.com/commands/update/update-sql.html
+    actions:
+      - type: liquibase
+        command: rollback-sql
+        cmdArgs: { }
+
+    # Run Update on Latest Repo State
+    # https://docs.liquibase.com/commands/update/update.html
+      # - type: liquibase
+        # command: update
+        # cmdArgs: { }
+
+endStage:
+    actions:
+      # Show history
+      # https://docs.liquibase.com/commands/change-tracking/history.html
+      - type: liquibase
+        command: history
+        cmdArgs: {}

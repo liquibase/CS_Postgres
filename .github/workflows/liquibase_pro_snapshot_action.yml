@@ -1,10 +1,9 @@
 ####################################################################
-#  GitHub Action to perform an environment-targeted deployment of
-#  database changes using Liquibase Pro, Liquibase Pro Flows,
-#  Custom Quality checks and S3.
+#  GitHub Action to take snapshot for use in Drift Detection
+#  database changes using Liquibase Pro and S3.
 #####################################################################
-name: 'Liquibase Pro Deployment Job'
-run-name: ${{ inputs.environment}} deployment of current repo by ${{ github.actor }}
+name: 'Liquibase Pro Snapshot Job'
+run-name: ${{ inputs.environment}} snapshot by ${{ github.actor }}
 
 on:
 
@@ -13,7 +12,7 @@ on:
     inputs:
       # The type 'environment' will automatically pull in the environments created in GitHub
       environment:
-        description: 'Environment to deploy to'
+        description: 'Environment to snapshot'
         type: environment
         required: true
       # For more info on log level, see: https://docs.liquibase.com/parameters/log-level.html
@@ -58,24 +57,10 @@ env:
   LIQUIBASE_COMMAND_DEFAULT_SCHEMA_NAME: abc
 
   # Search path (See https://docs.liquibase.com/concepts/changelogs/how-liquibase-finds-files.html)
-  LIQUIBASE_SEARCH_PATH: src/main/resources/changelogs,s3://${{ secrets.AWS_S3_BUCKET }}/static/flows/,s3://${{ secrets.AWS_S3_BUCKET }}/snapshots
+  LIQUIBASE_SEARCH_PATH: src/main/resources/changelogs,s3://${{ secrets.AWS_S3_BUCKET }}/static/flows/
 
   # The database changelog. See https://docs.liquibase.com/concepts/changelogs/working-with-changelogs.html
   LIQUIBASE_COMMAND_CHANGELOG_FILE: "root.yaml"
-
-  # Location of the Quality Checks settings file
-  LIQUIBASE_COMMAND_CHECKS_SETTINGS_FILE: s3://${{ secrets.AWS_S3_BUCKET }}/static/checks/liquibase.checks-settings.conf
-
-  # The top level Flow File that orchestrates the database changes. Use 'LB' instead of 'LIQUIBASE' to avoid warning.
-  LB_FLOW_FILE: s3://${{ secrets.AWS_S3_BUCKET }}/static/flows/deploy-changes-update-db.yaml
-
-  # Flow environment variables. Use 'LB' instead of 'LIQUIBASE' to avoid warning.
-  LB_FLOW_ENV: ${{ inputs.environment }}
-  LB_DEPLOYMENT: ${{ github.run_id }}.${{ github.run_number }}
-  
-  # Drift Settings
-  # See https://docs.liquibase.com/tools-integrations/observability/operation-reports-drift-report.html
-  LIQUIBASE_COMMAND_REFERENCE_URL: "offline:postgres?snapshot=${{ inputs.environment }}-snapshot.json"
   
   # Location where to store snapshot
   LIQUIBASE_OUTPUT_FILE: s3://${{ secrets.AWS_S3_BUCKET }}/snapshots/${{ inputs.environment }}-snapshot.json
@@ -83,8 +68,6 @@ env:
   # Logging settings
   LIQUIBASE_REPORTS_ENABLED: true
   LIQUIBASE_REPORTS_PATH: reports
-  LIQUIBASE_COMMAND_DIFF_REPORT_NAME: drift_report.html
-  LIQUIBASE_COMMAND_DIFF_DRIFT_SEVERITY: 1
   LIQUIBASE_SHOW_BANNER: false
   LIQUIBASE_LOG_FORMAT: JSON_PRETTY
   LIQUIBASE_LOG_FILE: logs/log.json
@@ -92,10 +75,10 @@ env:
 
 jobs:
   #########################################################################
-  #  Update using repo
+  #  Snapshot
   #########################################################################
 
-  database-deploy:
+  snapshot:
     runs-on: [self-hosted]
     environment: ${{ inputs.environment }}
 
@@ -108,23 +91,7 @@ jobs:
         uses: actions/checkout@v3
         
         # Execute the Flow file
-      - name: Run flow
+      - name: Take snapshot
         run: |
-          liquibase flow \
-             --flow-file=${{ env.LB_FLOW_FILE }}  
-       
-####################################################################
-#  Artifact creation for Reports
-####################################################################
-  create-reports-artifact:
-    needs: [database-deploy]
-    runs-on: [self-hosted]
-    environment: ${{ inputs.environment }}
-    if: always()
-
-    steps:
-      # Save reports as artifact
-      - uses: actions/upload-artifact@v3
-        with:
-          name: REPORTS-${{ github.run_id }}.${{ github.run_number }}.zip
-          path: reports/
+          liquibase snapshot --snapshot-format=json
+             

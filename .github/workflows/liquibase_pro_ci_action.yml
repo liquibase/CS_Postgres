@@ -60,9 +60,17 @@ env:
   LB_FLOW_ENV: DEV
   LB_BUILD: ${{ github.run_id }}.${{ github.run_number }}
   
+  # Drift Settings
+  # See https://docs.liquibase.com/tools-integrations/observability/operation-reports-drift-report.html
+  LIQUIBASE_COMMAND_REFERENCE_URL: "offline:postgres?snapshot=DEV-snapshot.json"
+  
+  # Location where to store snapshot
+  LIQUIBASE_OUTPUT_FILE: s3://${{ secrets.AWS_S3_BUCKET }}/snapshots/DEV-snapshot.json
+  
   # Logging settings
   LIQUIBASE_REPORTS_ENABLED: true
   LIQUIBASE_REPORTS_PATH: reports
+  LIQUIBASE_COMMAND_DIFF_REPORT_NAME: drift_report.html
   LIQUIBASE_SHOW_BANNER: false
   LIQUIBASE_LOG_FORMAT: JSON_PRETTY
   LIQUIBASE_LOG_FILE: logs/log.json
@@ -115,6 +123,7 @@ jobs:
     needs: [database-change-flow]
     runs-on: [self-hosted]
     environment: DEV
+    if: always()
 
     steps:
       # Upload a copy to GHA for auditability
