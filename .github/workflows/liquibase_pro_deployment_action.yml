@@ -81,6 +81,7 @@ env:
   # Logging settings
   LIQUIBASE_REPORTS_ENABLED: true
   LIQUIBASE_REPORTS_PATH: reports
+  LIQUIBASE_COMMAND_DIFF_REPORT_NAME: drift_report.html
   LIQUIBASE_SHOW_BANNER: false
   LIQUIBASE_LOG_FORMAT: JSON_PRETTY
   LIQUIBASE_LOG_FILE: logs/log.json
@@ -102,10 +103,6 @@ jobs:
         # Check out the source code
       - name: Checkout repo
         uses: actions/checkout@v3
-        
-      - name: TEST DRIFT
-        run: |
-          liquibase diff   
         
         # Execute the Flow file
       - name: Run flow
