@@ -109,6 +109,7 @@ env:
   LIQUIBASE_SHOW_BANNER: false
   LIQUIBASE_LOG_FORMAT: JSON_PRETTY
   LIQUIBASE_LOG_FILE: logs/log.json
+  LIQUIBASE_LOG_LEVEL: ${{ inputs.log-level }}
           
 jobs:
   #########################################################################
@@ -132,26 +133,29 @@ jobs:
           # liquibase flow \
              # --flow-file=${{ env.LB_FLOW_FILE }}
              
+             
+      # Get name of rollback command by extracting eg. "1-" from input name
+      - name: Extract Rollback Command Name
+        run: |
+          ROLLBACK_COMMAND=$(echo ${{ inputs.command }}|grep -P '[0-9]-.*' -o | cut -c 3-)
+             
       - name: Run liquibase command
         run: |
           liquibase \
-             ${{ inputs.global-arguments}} \
-             --log-level=${{ inputs.log-level}} \
-             --changelog-file=root.yaml \
-             rollback
+            $ROLLBACK_COMMAND
                    
        
-####################################################################
-#  Artifact creation for Reports
-####################################################################
-  create-reports-artifact:
-    needs: [database-rollback]
-    runs-on: [self-hosted]
-    environment: ${{ inputs.environment }}
+###############################################################################
+#  Artifact creation for Reports - For Use when Rollback Report is available
+###############################################################################
+  # create-reports-artifact:
+    # needs: [database-rollback]
+    # runs-on: [self-hosted]
+    # environment: ${{ inputs.environment }}
 
-    steps:
+    # steps:
       # Save reports as artifact
-      - uses: actions/upload-artifact@v3
-        with:
-          name: REPORTS-${{ github.run_id }}.${{ github.run_number }}.zip
-          path: reports/
+      # - uses: actions/upload-artifact@v3
+        # with:
+          # name: REPORTS-${{ github.run_id }}.${{ github.run_number }}.zip
+          # path: reports/
