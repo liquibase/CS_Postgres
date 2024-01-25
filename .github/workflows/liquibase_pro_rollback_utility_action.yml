@@ -159,8 +159,8 @@ jobs:
           ROLLBACK_COMMAND=$(echo ${{ inputs.command }}|grep -P '[0-9]-.*' -o | cut -c 3-)
           echo ${{ inputs.rollback-one-changeset}}
           LIQUIBASE_COMMAND_CHANGESET_AUTHOR=$(echo ${{ inputs.rollback-one-changeset}}| cut -d "," -f 1)
-          LIQUIBASE_COMMAND_CHANGESET_ID=$(echo ${{ inputs.rollback-one-changeset}}|| cut -d "," -f 2)
-          LIQUIBASE_COMMAND_CHANGESET_PATH=$(echo ${{ inputs.rollback-one-changeset}}|| cut -d "," -f 3)
+          LIQUIBASE_COMMAND_CHANGESET_ID=$(echo ${{ inputs.rollback-one-changeset}}| cut -d "," -f 2)
+          LIQUIBASE_COMMAND_CHANGESET_PATH=$(echo ${{ inputs.rollback-one-changeset}}| cut -d "," -f 3)
           echo $LIQUIBASE_COMMAND_CHANGESET_AUTHOR
           echo $LIQUIBASE_COMMAND_CHANGESET_ID
           echo $LIQUIBASE_COMMAND_CHANGESET_PATH
