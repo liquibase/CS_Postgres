@@ -105,7 +105,8 @@ jobs:
         
       - name: TEST DRIFT
         run: |
-          wget http://asmith-s3-extension-demo.s3.amazonaws.com/snapshots/TEST-snapshot.json > ./snapshots/TEST-snapshot.json
+          mkdir -p snapshots
+          wget http://asmith-s3-extension-demo.s3.amazonaws.com/snapshots/TEST-snapshot.json > snapshots/TEST-snapshot.json
           liquibase diff --reference-url="offline:postgres?snapshot=/snapshots/TEST-snapshot.json  
         
         # Execute the Flow file
