@@ -153,8 +153,8 @@ jobs:
         run: |
           ROLLBACK_COMMAND=$(echo ${{ inputs.command }}|grep -P '[0-9]-.*' -o | cut -c 3-)
           liquibase \
-            $ROLLBACK_COMMAND
-                   
+            $ROLLBACK_COMMAND \
+            --force                       
        
 ###############################################################################
 #  Artifact creation for Reports - For Use when Rollback Report is available
