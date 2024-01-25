@@ -85,3 +85,4 @@ endStage:
       # https://docs.liquibase.com/commands/change-tracking/history.html
       - type: liquibase
         command: history
+        cmdArgs: {}
