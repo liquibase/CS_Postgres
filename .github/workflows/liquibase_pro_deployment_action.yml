@@ -76,7 +76,7 @@ env:
   # Drift Settings
   # See https://docs.liquibase.com/tools-integrations/observability/operation-reports-drift-report.html
   # LIQUIBASE_COMMAND_REFERENCE_URL: "offline:postgres?snapshot=s3://${{ secrets.AWS_S3_BUCKET }}/snapshots/${{ inputs.environment }}-snapshot.json"
-  LIQUIBASE_COMMAND_REFERENCE_URL: "offline:postgres?snapshot=s3://asmith-s3-extension-demo/snapshots/TEST-snapshot.json"
+  LIQUIBASE_COMMAND_REFERENCE_URL: offline:postgres?snapshot=s3://asmith-s3-extension-demo/snapshots/TEST-snapshot.json
   
   # Logging settings
   LIQUIBASE_REPORTS_ENABLED: true
