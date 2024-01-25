@@ -78,7 +78,7 @@ env:
   LIQUIBASE_COMMAND_REFERENCE_URL: "offline:postgres?snapshot=${{ inputs.environment }}-snapshot.json"
   
   # Location where to store snapshot
-  LIQUIBASE_OUTPUT_FILE: s3://${{ secrets.AWS_S3_BUCKET }}/snapshots/${{ inputs.environment }}-snapshot.json
+  LB_SNAPSHOT_OUTPUT_FILE: s3://${{ secrets.AWS_S3_BUCKET }}/snapshots/${{ inputs.environment }}-snapshot.json
   
   # Logging settings
   LIQUIBASE_REPORTS_ENABLED: true
