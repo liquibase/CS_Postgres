@@ -135,15 +135,9 @@ jobs:
              
              
       # Get name of rollback command by extracting eg. "1-" from input name
-      - name: Extract Rollback Command Name
+      - name: Extract Rollback Command Name and run command
         run: |
-          ROLLBACK_COMMAND=${{ inputs.command }}
-          echo $ROLLBACK_COMMAND
-          ROLLBACK_COMMAND=$(echo $ROLLBACK_COMMAND|grep -P '[0-9]-.*' -o | cut -c 3-)
-          echo $ROLLBACK_COMMAND
-             
-      - name: Run liquibase command
-        run: |
+          ROLLBACK_COMMAND=$(echo ${{ inputs.command }}|grep -P '[0-9]-.*' -o | cut -c 3-)
           liquibase \
             $ROLLBACK_COMMAND
                    
