@@ -120,7 +120,7 @@ env:
   
   # 4-Rollback one update environment variables
   # Need Parameter Support. Currently rolls back last deployment.
-  LIQUIBASE_DEPLOYMENT_ID: ${{ inputs.rollback-one-update}}
+  LIQUIBASE_COMMAND_DEPLOYMENT_ID: ${{ inputs.rollback-one-update}}
   
   # Logging settings
   LIQUIBASE_REPORTS_ENABLED: true
@@ -166,8 +166,7 @@ jobs:
           echo $LIQUIBASE_COMMAND_CHANGESET_PATH
           
           liquibase \
-            $ROLLBACK_COMMAND \
-            --force                  
+            $ROLLBACK_COMMAND               
        
 ###############################################################################
 #  Artifact creation for Reports - For Use when Rollback Report is available
