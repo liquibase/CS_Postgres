@@ -117,6 +117,7 @@ jobs:
     needs: [database-deploy]
     runs-on: [self-hosted]
     environment: ${{ inputs.environment }}
+    if: always()
 
     steps:
       # Save reports as artifact

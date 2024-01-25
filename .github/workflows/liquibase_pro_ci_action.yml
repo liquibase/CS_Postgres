@@ -120,6 +120,7 @@ jobs:
     needs: [database-change-flow]
     runs-on: [self-hosted]
     environment: DEV
+    if: always()
 
     steps:
       # Upload a copy to GHA for auditability
