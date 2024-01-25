@@ -28,6 +28,16 @@ stages:
             checks-settings-file: "s3://${AWS_S3_BUCKET}/static/checks/liquibase.checks-settings.conf"
           }
 
+  driftDetection:
+    # Check if manual updates were made to the environment since last deployment
+    actions:
+      - type: liquibase
+        command: diff
+        cmdArgs: 
+          { referenceURL: "${LIQUIBASE_COMMAND_REFERENCE_URL}", 
+            format: json
+          }
+  
   tagDatabaseBegin:
     # Tag database current state
     # See https://docs.liquibase.com/commands/change-tracking/tag.html
