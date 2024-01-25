@@ -167,9 +167,7 @@ jobs:
           
           liquibase \
             $ROLLBACK_COMMAND \
-            --force
-            
-                   
+            --force                  
        
 ###############################################################################
 #  Artifact creation for Reports - For Use when Rollback Report is available
