@@ -1,0 +1,35 @@
+# rollback-changes-update-db.yaml
+# Description:
+# This flow runs several Liquibase rollback commands
+
+stages:
+  liquibaseRollback:
+    # Run Update on Latest Repo State
+    # https://docs.liquibase.com/commands/update/update-sql.html
+    actions:
+      - type: liquibase
+        if: "${LB_ROLLBACK_COMMAND} == rollback"
+        command: rollback
+        cmdArgs: { }
+      
+      - type: liquibase
+        if: "${LB_ROLLBACK_COMMAND} == rollback-count"
+        command: rollback-count
+        cmdArgs: { }
+        
+      - type: liquibase
+        if: "${LB_ROLLBACK_COMMAND} == rollback-one-changeset"
+        command: rollback-one-changeset
+        cmdArgs: { force: "true" }
+
+      - type: liquibase
+        if: "${LB_ROLLBACK_COMMAND} == rollback-one-update"
+        command: rollback-one-update
+        cmdArgs: { force: "true" }      
+
+endStage:
+    actions:
+      # Show history
+      # https://docs.liquibase.com/commands/change-tracking/history.html
+      - type: liquibase
+        command: history

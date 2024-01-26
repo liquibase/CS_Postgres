@@ -1,31 +1,41 @@
 # rollback-changes-update-db.yaml
 # Description:
-# This flow runs several Liquibase rollback commands
+#   This flow runs several Liquibase commands to generate information that could be useful for review, auditing
+#   and troubleshooting purposes.  It will run in all shared pipeline environments from CI onward.
 
 stages:
-  liquibaseRollback:
-    # Run Update on Latest Repo State
-    # https://docs.liquibase.com/commands/update/update-sql.html
+  validateChangelog:
+    # Run validate on Repo Changelog
+    # https://docs.liquibase.com/commands/update/validate.html
     actions:
       - type: liquibase
-        if: "${LB_ROLLBACK_COMMAND} == rollback"
+        command: validate
+        cmdArgs: {}
+
+  liquibaseRollback:
+    # Run Rollback-SQL on Latest Repo State
+    # https://docs.liquibase.com/commands/rollback/rollback-sql.html
+    actions:
+      - type: liquibase
+        command: rollback-sql
+        cmdArgs: { }
+
+    # Run Rollback on Latest Repo State
+    # https://docs.liquibase.com/commands/rollback/rollback-by-tag.html
+      - type: liquibase
         command: rollback
         cmdArgs: { }
-      
+    
+  newSnapshot:
+    # Upload a new snapshot
+    actions:
       - type: liquibase
-        if: "${LB_ROLLBACK_COMMAND} == rollback-count"
-        command: rollback-count
-        cmdArgs: { }
-        
-      - type: liquibase
-        if: "${LB_ROLLBACK_COMMAND} == rollback-one-changeset"
-        command: rollback-one-changeset
-        cmdArgs: { force: "true" }
-
-      - type: liquibase
-        if: "${LB_ROLLBACK_COMMAND} == rollback-one-update"
-        command: rollback-one-update
-        cmdArgs: { force: "true" }      
+        command: snapshot
+        cmdArgs: 
+          { referenceURL: "${LIQUIBASE_COMMAND_REFERENCE_URL}", 
+            snapshot-format: json 
+          }
+        globalArgs: { outputfile: "${LB_SNAPSHOT_OUTPUT_FILE}" }
 
 endStage:
     actions:
