@@ -12,7 +12,7 @@ stages:
         command: validate
         cmdArgs: {}
 
-  liquibaseRollback:
+  liquibaseRollbackSQL:
     # Run Rollback-SQL on Latest Repo State
     # https://docs.liquibase.com/commands/rollback/rollback-sql.html
     actions:
@@ -20,8 +20,8 @@ stages:
         command: rollback-sql
         cmdArgs: { }
 
-    # Run Rollback on Latest Repo State
-    # https://docs.liquibase.com/commands/rollback/rollback-by-tag.html
+  liquibaseRollback:
+    actions:
       - type: liquibase
         command: rollback
         cmdArgs: { }
