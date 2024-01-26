@@ -112,7 +112,11 @@ jobs:
       - name: Run flow
         run: |
           liquibase flow \
-             --flow-file=${{ env.LB_FLOW_FILE }}  
+             --flow-file=${{ env.LB_FLOW_FILE }}
+      
+      - name: Rollback-TEST
+        run: |
+          liquibase rollback
        
 ####################################################################
 #  Artifact creation for Reports
