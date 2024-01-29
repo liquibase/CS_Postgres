@@ -142,11 +142,11 @@ jobs:
       # Clean the workspace to help clean up self-Hosted runners prior to deployment
       - uses: AutoModality/action-clean@v1
 
-        # Check out the source code
+      # Check out the source code
       - name: Checkout repo
         uses: actions/checkout@v3
         
-        # Execute the Flow file
+      # Execute the Flow file
       # - name: Run flow
         # run: |
           # liquibase flow \
