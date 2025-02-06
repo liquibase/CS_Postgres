@@ -127,7 +127,7 @@ jobs:
 
     steps:
       # Upload a copy to GHA for auditability
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: SNAPSHOT-artifact-${{ github.run_id }}.${{ github.run_number }}.zip
           path: .
