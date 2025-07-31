@@ -84,8 +84,6 @@ jobs:
 
   database-deploy:
     runs-on: [self-hosted]
-    env:
-      LIQUIBASE_LICENSE_KEY: ${{ secrets.LIQUIBASE_PRO_LICENSE_KEY }}
     outputs:
       needs_approval: ${{ steps.lbp-policy-checks.outputs.needs_approval }}
       exit_message: ${{ steps.lbp-policy-checks.outputs.exit_message }}
@@ -110,7 +108,7 @@ jobs:
     - name: Liquibase Checks Flow
       id: lbp-policy-checks
       run: | 
-        liquibase flow --classpath=liquibase-aws-extension.jar --flow-file=liquibase-checks.flowfile.yaml
+        liquibase flow --classpath=liquibase-aws-extension.jar --flow-file=liquibase-checks.flowfile.yaml --license-key=$LIQUIBASE_LICENSE_KEY
       
         set +e
         CHECKS_STATUS=$(liquibase flow --classpath=liquibase-aws-extension.jar --flow-file=liquibase-checks.flowfile.yaml 2>&1)
