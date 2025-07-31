@@ -15,14 +15,14 @@ stages:
     actions:
       - type: shell
         if: "${CHECK_DRIFT} == true"
-        command: liquibase --classpath=liquibase-aws-extension.jar --search-path=s3://${BUCKET}/gh_sqlserver_snapshots/ diff --reference-url=offline:mssql?snapshot=${ENV}-snapshot.json --report-name="drift-report-${ENV}.html" --reports-enabled=true --drift-severity=1 --schemas=${SCHEMAS}
+        command: liquibase --classpath=liquibase-aws-extension.jar --search-path=s3://${BUCKET}/gh_postgres_snapshots/ diff --reference-url=offline:postgres?snapshot=${ENV}-snapshot.json --report-name="drift-report-${ENV}.html" --reports-enabled=true --drift-severity=1 --schemas=${SCHEMAS}
 
     # actions:
       # - type: liquibase
         # if: "${CHECK_DRIFT} == true"
         # command: diff
-        # cmdArgs: { schemas: "${SCHEMAS}", drift-severity: "1", reference-url: "offline:mssql?snapshot=${ENV}-snapshot.json" }
-        # globalArgs: { reports-name: "drift-report-${ENV}.html", search-path: "s3://${BUCKET}/gh_sqlserver_snapshots/" }
+        # cmdArgs: { schemas: "${SCHEMAS}", drift-severity: "1", reference-url: "offline:postgres?snapshot=${ENV}-snapshot.json" }
+        # globalArgs: { reports-name: "drift-report-${ENV}.html", search-path: "s3://${BUCKET}/gh_postgres_snapshots/" }
           
   Validation:
     actions: 
@@ -80,10 +80,10 @@ endStage:
     - type: liquibase
       command: snapshot
       cmdArgs: {  snapshot-format: json, schemas: "${SCHEMAS}"}
-      globalArgs: { output-file: 's3://${BUCKET}/gh_sqlserver_snapshots/${ENV}-snapshot.json' }
+      globalArgs: { output-file: 's3://${BUCKET}/gh_postgres_snapshots/${ENV}-snapshot.json' }
         
     - type: shell
-      command: echo 'Updated snapshot saved to s3://${BUCKET}/gh_sqlserver_snapshots/${ENV}-snapshot.json'  
+      command: echo 'Updated snapshot saved to s3://${BUCKET}/gh_postgres_snapshots/${ENV}-snapshot.json'  
   
     - type: liquibase
       command: history
