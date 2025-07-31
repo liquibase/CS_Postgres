@@ -15,3 +15,7 @@ create table Contacts2 (
   dept varchar(30) 
 );
 --rollback DROP TABLE Contacts2;
+
+--changeset amy.smith:contacts_delete
+delete from Contacts;
+--rollback select '1';
