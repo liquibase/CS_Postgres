@@ -123,7 +123,6 @@ jobs:
           echo "exit_message=✅ Liquibase checks passed" >> $GITHUB_OUTPUT
           echo "✅ Proceeding automatically"
         fi
-        echo "Test msg C"
       
   manual-approval:
     runs-on: [self-hosted]
