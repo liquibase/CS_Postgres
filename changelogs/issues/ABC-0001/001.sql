@@ -19,3 +19,7 @@ create table Contacts2 (
 --changeset amy.smith:contacts_delete
 delete from Contacts;
 --rollback select '1';
+
+--changeset amy.smith:contacts_delete2
+delete from Contacts;
+--rollback select '1';
