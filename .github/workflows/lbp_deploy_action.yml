@@ -82,7 +82,7 @@ jobs:
   #  Deploy
   #########################################################################
 
-  database-deploy:
+  run-policy-checks:
     runs-on: [self-hosted]
     environment: ${{ inputs.environment }}
     outputs:
@@ -126,14 +126,14 @@ jobs:
       
   manual-approval:
     runs-on: [self-hosted]
-    needs: database-deploy
+    needs: run-policy-checks
     environment: manual-approval
-    if: needs.database-deploy.outputs.needs_approval == 'true'
+    if: needs.run-policy-checks.outputs.needs_approval == 'true'
     steps:
     - name: Request manual approval
       run: |
         echo "🚨 Manual approval required!"
-        echo "Exit message: ${{ needs.database-deploy.outputs.exit_message }}"
+        echo "Exit message: ${{ needs.run-policy-checks.outputs.exit_message }}"
         echo "Click 'Review deployments' to approve or reject this deployment."
         echo ""
         echo "To approve: Click 'Review deployments' button above"
@@ -141,9 +141,9 @@ jobs:
       
   deploy:
     runs-on: [self-hosted]
-    needs: [database-deploy, manual-approval]
+    needs: [run-policy-checks, manual-approval]
     environment: ${{ inputs.environment }}
-    if: always() && (needs.database-deploy.outputs.needs_approval == 'false' || needs.manual-approval.result == 'success')
+    if: always() && (needs.run-policy-checks.outputs.needs_approval == 'false' || needs.manual-approval.result == 'success')
     steps:
     - uses: actions/checkout@v4    
 
