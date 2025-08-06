@@ -71,7 +71,8 @@ env:
   
   ENVIRONMENT: ${{ inputs.environment }}
   LB_TAG: ${{ github.event.inputs.lb_tag || github.ref_name }}
-  LIQUIBASE_REPORT_PATH: s3://${{ secrets.AWS_S3_BUCKET }}/gha_postgres_reports
+  # LIQUIBASE_REPORT_PATH: s3://${{ secrets.AWS_S3_BUCKET }}/gha_postgres_reports
+  LIQUIBASE_REPORT_PATH: reports
   # Values: OFF, SEVERE, WARNING, INFO, FINE
   LIQUIBASE_LOG_LEVEL: INFO
   LB_CHECK_DRIFT: ${{ github.event.inputs.check_drift }}
@@ -164,3 +165,61 @@ jobs:
 
     - name: Liquibase Deploy Flow
       run: liquibase flow --classpath=liquibase-aws-extension.jar --flow-file=liquibase-deploy.flowfile.yaml
+
+####################################################################
+#  Artifact creation for Reports
+####################################################################
+  create-reports-artifact-checks:
+    needs: [run-policy-checks]
+    runs-on: [self-hosted]
+    environment: ${{ inputs.environment }}
+    if: always()
+
+    steps:
+      # Save reports as artifact
+      - uses: actions/upload-artifact@v4
+        with:
+          name: REPORTS-${{ github.run_id }}.${{ github.run_number }}.zip
+          path: reports
+
+  create-reports-artifact-deploy:
+    needs: [run-policy-checks,deploy]
+    runs-on: [self-hosted]
+    environment: ${{ inputs.environment }}
+    if: always()
+
+    steps:
+      # Save reports as artifact
+      - uses: actions/upload-artifact@v4
+        with:
+          name: REPORTS-${{ github.run_id }}.${{ github.run_number }}.zip
+          path: reports
+
+      # Also zip reports for S3
+      - name: Create zip file for S3
+        run: |
+          if [ -d "reports" ] && [ "$(ls -A reports)" ]; then
+            zip -r REPORTS-${{ github.run_id }}.${{ github.run_number }}.zip reports/
+            echo "zip_created=true" >> $GITHUB_OUTPUT
+            echo "Reports zipped successfully"
+          else
+            echo "zip_created=false" >> $GITHUB_OUTPUT
+            echo "No reports directory found or directory is empty - skipping zip creation"
+          fi
+          
+      # Configure AWS credentials for S3 upload
+      - name: Configure AWS credentials
+        if: steps.create_zip.outputs.zip_created == 'true'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      # Upload to S3
+      - name: Upload reports to S3
+        if: steps.create_zip.outputs.zip_created == 'true'
+        run: |
+          aws s3 cp REPORTS-${{ github.run_id }}.${{ github.run_number }}.zip \
+            s3://${{ secrets.AWS_S3_BUCKET }}/gha_postgres_reports/${{ inputs.environment }}/ \
+            --metadata "run-id=${{ github.run_id }},run-number=${{ github.run_number }},environment=${{ inputs.environment }}"
