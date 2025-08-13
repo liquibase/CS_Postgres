@@ -1,15 +1,17 @@
 --liquibase formatted sql
 
---changeset amy.smith:sales_contacts labels:abc-002
-create table Contacts3 (
-  id int
+--changeset amy.smith:sales_contacts4 labels:abc-002
+create table Contacts4 (
+  id int, 
+  name varchar(30),
+  dept varchar(30)
 );
---rollback DROP TABLE Contacts3;
+--rollback DROP TABLE Contacts4;
 
---changeset amy.smith:sales_contacts_idx labels:abc-002
-CREATE UNIQUE INDEX name3_idx ON Contacts3 (name);
---rollback DROP INDEX name3_idx on Contacts3;
+--changeset amy.smith:sales_contacts4_idx labels:abc-002
+CREATE UNIQUE INDEX name4_idx ON Contacts4 (name);
+--rollback DROP INDEX name4_idx on Contacts4;
 
---changeset amy.smith:Contacts3_delete labels:abc-0002 runAlways:true
-delete from Contacts3;
+--changeset amy.smith:Contacts4_delete labels:abc-0002 runAlways:true
+delete from Contacts4;
 --rollback select '1';
