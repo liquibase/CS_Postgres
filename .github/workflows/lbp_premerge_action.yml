@@ -102,6 +102,20 @@ jobs:
       run: |
         echo "sqlcmd version:"
         sqlcmd -?
+
+    - name: Liquibase Checks Flow
+      id: lbp-policy-checks
+      continue-on-error: true
+      run: | 
+        set +e
+        CHECKS_STATUS=$(liquibase flow --classpath=liquibase-aws-extension.jar --flow-file=liquibase-checks.flowfile.yaml 2>&1)
+        EXIT_CODE=$?
+        set -e
+        if [ $EXIT_CODE -eq 1 ]; then
+          echo "::error::Policy checks did not pass, but allowing merge."
+          echo "::error::In non-build environments, this deployment will require Manual Approval."
+          exit $EXIT_CODE
+        fi
         
     - name: Liquibase Premerge Flow
       run: liquibase flow --classpath=liquibase-aws-extension.jar --flow-file=liquibase-premerge.flowfile.yaml
