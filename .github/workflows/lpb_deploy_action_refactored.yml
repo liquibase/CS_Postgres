@@ -62,7 +62,7 @@ jobs:
     - uses: actions/checkout@v4
     
     - name: Setup Liquibase Environment
-      uses: ./.github/actions/setup-liquibase
+      uses: ./.github/workflows/setup-liquibase
       
     - name: Liquibase Checks Flow
       id: lbp-policy-checks
@@ -84,7 +84,7 @@ jobs:
     
     - name: Upload Reports Artifact
       if: always()
-      uses: ./.github/actions/upload-reports
+      uses: ./.github/workflows/upload-reports
       with:
         job-type: checks
 
@@ -112,14 +112,14 @@ jobs:
     - uses: actions/checkout@v4
     
     - name: Setup Liquibase Environment
-      uses: ./.github/actions/setup-liquibase
+      uses: ./.github/workflows/setup-liquibase
 
     - name: Liquibase Deploy Flow
       run: liquibase flow --classpath=liquibase-aws-extension.jar --flow-file=liquibase-deploy.flowfile.yaml
       
     - name: Upload Reports Artifact
       if: always()
-      uses: ./.github/actions/upload-reports
+      uses: ./.github/workflows/upload-reports
       with:
         job-type: deploy
         upload-s3: true

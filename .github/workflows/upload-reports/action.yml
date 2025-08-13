@@ -1,4 +1,4 @@
-# .github/actions/upload-reports/action.yml
+# .github/workflows/upload-reports/action.yml
 name: 'Upload Reports Artifact'
 description: 'Creates artifact for reports and optionally uploads to S3'
 
