@@ -39,10 +39,13 @@ stages:
     actions:
       - type: shell
         command: |
-          sqlcmd -b -U "${LIQUIBASE_COMMAND_USERNAME}" -P "${LIQUIBASE_COMMAND_PASSWORD}" -S "tcp:${LB_HOSTNAME},${LB_PORT}" -C -d "master" -Q "DBCC clonedatabase([${LB_DATABASENAME}], [${LB_DATABASENAME}_eph]) with verify_clonedb"
-          sqlcmd -b -U "${LIQUIBASE_COMMAND_USERNAME}" -P "${LIQUIBASE_COMMAND_PASSWORD}" -S "tcp:${LB_HOSTNAME},${LB_PORT}" -C -d "master" -Q "alter database [${LB_DATABASENAME}_eph] set read_write"
-          sqlcmd -b -U "${LIQUIBASE_COMMAND_USERNAME}" -P "${LIQUIBASE_COMMAND_PASSWORD}" -S "tcp:${LB_HOSTNAME},${LB_PORT}" -C -d "master" -Q "INSERT INTO [${LB_DATABASENAME}_eph].${LIQUIBASE_LIQUIBASE_SCHEMA_NAME}.DATABASECHANGELOG SELECT * FROM ${LB_DATABASENAME}.${LIQUIBASE_LIQUIBASE_SCHEMA_NAME}.DATABASECHANGELOG"
-
+          pg_dump -h ${LB_HOSTNAME} -p ${LB_PORT} -U ${LIQUIBASE_COMMAND_USERNAME} -d ${LB_DATABASENAME} -F c -n ${LB_SCHEMAS} -n ${LIQUIBASE_LIQUIBASE_SCHEMA_NAME} --schema-only -f backups\${LB_DATABASENAME
+          pg_dump -h ${LB_HOSTNAME} -p ${LB_PORT} -U ${LIQUIBASE_COMMAND_USERNAME} -d ${LB_DATABASENAME} -F c -n ${LIQUIBASE_LIQUIBASE_SCHEMA_NAME} -t DATABASECHANGELOG --data-only --no-owner --no-privileges -f backups\${LB_DATABASENAME_dbcl_data
+          
+          CREATE DATABASE ${LB_DATABASENAME}_eph
+          pg_restore -h ${LB_HOSTNAME} -p ${LB_PORT} -U ${LIQUIBASE_COMMAND_USERNAME} -d ${LB_DATABASENAME}_eph -F c -n ${LB_SCHEMAS} -n ${LIQUIBASE_LIQUIBASE_SCHEMA_NAME} backups\${LB_DATABASENAME
+          pg_restore -h ${LB_HOSTNAME} -p ${LB_PORT} -U ${LIQUIBASE_COMMAND_USERNAME} -d ${LB_DATABASENAME}_eph -F c -n ${LB_SCHEMAS} -n ${LIQUIBASE_LIQUIBASE_SCHEMA_NAME} backups\${LB_DATABASENAME_dbcl_data
+        
   # Deploy to ephemeral database
   Tag-and-Deploy-to-EphemeralDB:
     actions:
@@ -59,16 +62,16 @@ stages:
         command: history
         cmdArgs: { URL: "${CLONED_URL}" }
         
-endStage:
-  actions:
+# endStage:
+  # actions:
    # Drop Ephemeral Database if it exists   
-    - type: shell
-      command: |
-        DB_EXISTS=$(sqlcmd -b -U "${LIQUIBASE_COMMAND_USERNAME}" -P "${LIQUIBASE_COMMAND_PASSWORD}" -S "tcp:${LB_HOSTNAME},${LB_PORT}" -C -d "master" -h -1 -Q "SELECT CASE WHEN DB_ID('${LB_DATABASENAME}_eph') IS NOT NULL THEN 'EXISTS' ELSE 'NOT_EXISTS' END")
-        echo "Database status: $DB_EXISTS"
-        if [[ "$DB_EXISTS" == *"NOT_EXISTS"* ]]; then
-          echo "Database does not exist - no drop necessary"
-        else
-          echo "Database exists - dropping"
-          sqlcmd -b -U "${LIQUIBASE_COMMAND_USERNAME}" -P "${LIQUIBASE_COMMAND_PASSWORD}" -S "tcp:${LB_HOSTNAME},${LB_PORT}" -C -d "master" -Q "drop database [${LB_DATABASENAME}_eph]"
-        fi
+    # - type: shell
+      # command: |
+        # DB_EXISTS=$(sqlcmd -b -U "${LIQUIBASE_COMMAND_USERNAME}" -P "${LIQUIBASE_COMMAND_PASSWORD}" -S "tcp:${LB_HOSTNAME},${LB_PORT}" -C -d "master" -h -1 -Q "SELECT CASE WHEN DB_ID('${LB_DATABASENAME}_eph') IS NOT NULL THEN 'EXISTS' ELSE 'NOT_EXISTS' END")
+        # echo "Database status: $DB_EXISTS"
+        # if [[ "$DB_EXISTS" == *"NOT_EXISTS"* ]]; then
+          # echo "Database does not exist - no drop necessary"
+        # else
+          # echo "Database exists - dropping"
+          # sqlcmd -b -U "${LIQUIBASE_COMMAND_USERNAME}" -P "${LIQUIBASE_COMMAND_PASSWORD}" -S "tcp:${LB_HOSTNAME},${LB_PORT}" -C -d "master" -Q "drop database [${LB_DATABASENAME}_eph]"
+        # fi

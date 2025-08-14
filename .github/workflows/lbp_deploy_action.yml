@@ -3,7 +3,7 @@
 #  database changes using Liquibase Pro, Liquibase Pro Flows,
 #  Custom Quality checks and S3.
 #####################################################################
-name: 'Liquibase Pro Deployment Job'
+name: 'Liquibase Pro Deploy Job'
 run-name: ${{ inputs.environment}} deployment of current repo by ${{ github.actor }}
 
 on:
