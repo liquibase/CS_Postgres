@@ -96,7 +96,10 @@ jobs:
     # Required to run commands for Cloning DB
     - name: Install Postgres Client Tools
       run: |
+        curl -O https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+        sudo rpm -Uvh pgdg-redhat-repo-latest.noarch.rpm
         sudo yum install postgresql14
+        
         echo "/usr/pgsql-14/bin" >> $GITHUB_PATH
 
     - name: Check pg_dump installation
