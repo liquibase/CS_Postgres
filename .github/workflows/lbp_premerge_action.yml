@@ -106,7 +106,7 @@ jobs:
         fi
         
         # Import GPG key
-        sudo rpm --import https://download.postgresql.org/pub/repos/yum/RPM-GPG-KEY-PGDG
+        sudo rpm --import https://download.postgresql.org/pub/repos/yum/keys/RPM-GPG-KEY-PGDG
 
         # Update cache
         sudo yum makecache
