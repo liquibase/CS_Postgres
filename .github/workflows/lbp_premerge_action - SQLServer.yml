@@ -5,7 +5,7 @@
 #  Liquibase changesets and destroys the copy at the end.
 #  Custom Policy checks and S3.
 #####################################################################
-name: 'Liquibase Pro Premerge Job - Postgres'
+name: 'Liquibase Pro Premerge Job - SQLServer'
 run-name: premerge of current repo by ${{ github.actor }}
 
 on:
