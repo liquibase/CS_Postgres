@@ -2,7 +2,7 @@
 #  GitHub Action to perform a build on the first database, eg. DEV,
 #  using Liquibase Pro, Flows, Policy checks, and S3.
 ##############################################################################
-name: 'Liquibase Pro Build Job - New'
+name: 'Liquibase Pro Build Job'
 run-name: ${{ inputs.environment}} build of current repo by ${{ github.actor }}
 
 on:
@@ -28,7 +28,7 @@ on:
 #####################################################################
 env:
   # AWS S3 bucket is the host part of the S3 bucket
-  # AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+  AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
   
   # AWS Access credentials use by the Liquibase Pro S3 Extension
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -68,7 +68,9 @@ env:
   BRANCH: ${{ github.ref_name }}
   LB_TAG: ${{ github.event.inputs.lb_tag || github.ref_name }}
 
-  LIQUIBASE_REPORT_PATH: s3://${{ secrets.AWS_S3_BUCKET }}/gha_reports
+  #LIQUIBASE_REPORT_PATH: s3://${{ secrets.AWS_S3_BUCKET }}/gha_reports
+  LIQUIBASE_REPORT_PATH: reports
+  
   # Values: OFF, SEVERE, WARNING, INFO, FINE
   LIQUIBASE_LOG_LEVEL: INFO
 
@@ -83,20 +85,8 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
-    # Required for self-hosted runners
-    - uses: actions/setup-java@v4
-      with:
-        distribution: 'temurin'
-        java-version: '17'
-    
-    - uses: liquibase/setup-liquibase@v1-beta
-      with:
-        version: '4.32.0'
-        edition: 'pro'
-
-    - name: Download AWS Extension
-      run: |
-        wget -O liquibase-aws-extension.jar https://repo1.maven.org/maven2/org/liquibase/ext/liquibase-aws-extension/1.0.1/liquibase-aws-extension-1.0.1.jar
+    - name: Setup Liquibase Environment
+      uses: ./.github/workflows/setup-liquibase
 
     - name: Liquibase Checks Flow
       id: lbp-policy-checks
@@ -116,3 +106,10 @@ jobs:
       run: liquibase flow --classpath=liquibase-aws-extension.jar --flow-file=liquibase-build.flowfile.yaml
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Auto-generated
+
+    - name: Upload Reports Artifact
+      if: always()
+      uses: ./.github/workflows/upload-reports
+      with:
+        job-type: deploy
+        upload-s3: true

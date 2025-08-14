@@ -1,0 +1,15 @@
+##########           LIQUIBASE FLOWFILE                ##########
+##########  learn more http://docs.liquibase.com/flow  ##########
+
+globalVariables:
+  ENV: ${ENVIRONMENT}
+  BUCKET: ${AWS_S3_BUCKET}
+  SCHEMAS: ${LB_SCHEMAS} 
+
+stages:
+  Snapshot:
+    actions:
+      - type: liquibase
+        command: snapshot
+        cmdArgs: {  snapshot-format: json, schemas: "${SCHEMAS}"}
+        globalArgs: { output-file: 's3://${BUCKET}/gh_sqlserver_snapshots/${ENV}-snapshot.json' }

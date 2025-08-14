@@ -3,7 +3,7 @@
 #  database changes using Liquibase Pro, Liquibase Pro Flows,
 #  Custom Quality checks and S3.
 #####################################################################
-name: 'Liquibase Pro Deployment Job - New'
+name: 'Liquibase Pro Deployment Job'
 run-name: ${{ inputs.environment}} deployment of current repo by ${{ github.actor }}
 
 on:
@@ -92,20 +92,8 @@ jobs:
     steps:
     - uses: actions/checkout@v4
    
-    # Required for self-hosted runners
-    - uses: actions/setup-java@v4
-      with:
-        distribution: 'temurin'
-        java-version: '17'
-
-    - uses: liquibase/setup-liquibase@v1-beta
-      with:
-        version: '4.32.0'
-        edition: 'pro'
-
-    - name: Download AWS Extension
-      run: |
-        wget -O liquibase-aws-extension.jar https://repo1.maven.org/maven2/org/liquibase/ext/liquibase-aws-extension/1.0.1/liquibase-aws-extension-1.0.1.jar
+    - name: Setup Liquibase Environment
+      uses: ./.github/workflows/setup-liquibase
 
     - name: Liquibase Checks Flow
       id: lbp-policy-checks
@@ -124,6 +112,12 @@ jobs:
           echo "exit_message=✅ Liquibase checks passed" >> $GITHUB_OUTPUT
           echo "✅ Proceeding automatically"
         fi
+
+    - name: Upload Reports Artifact
+      if: always()
+      uses: ./.github/workflows/upload-reports
+      with:
+        job-type: checks
       
   manual-approval:
     runs-on: [self-hosted]
@@ -148,78 +142,15 @@ jobs:
     steps:
     - uses: actions/checkout@v4    
 
-    # Required for self-hosted runners
-    - uses: actions/setup-java@v4
-      with:
-        distribution: 'temurin'
-        java-version: '17'
-
-    - uses: liquibase/setup-liquibase@v1-beta
-      with:
-        version: '4.32.0'
-        edition: 'pro'
-
-    - name: Download AWS Extension
-      run: |
-        wget -O liquibase-aws-extension.jar https://repo1.maven.org/maven2/org/liquibase/ext/liquibase-aws-extension/1.0.1/liquibase-aws-extension-1.0.1.jar
+    - name: Setup Liquibase Environment
+      uses: ./.github/workflows/setup-liquibase
 
     - name: Liquibase Deploy Flow
       run: liquibase flow --classpath=liquibase-aws-extension.jar --flow-file=liquibase-deploy.flowfile.yaml
 
-####################################################################
-#  Artifact creation for Reports
-####################################################################
-  create-reports-artifact-checks:
-    needs: [run-policy-checks]
-    runs-on: [self-hosted]
-    environment: ${{ inputs.environment }}
-    if: always()
-
-    steps:
-      # Save reports as artifact
-      - uses: actions/upload-artifact@v4
-        with:
-          name: REPORTS-${{ github.run_id }}.${{ github.run_number }}.zip
-          path: reports
-
-  create-reports-artifact-deploy:
-    needs: [run-policy-checks,deploy]
-    runs-on: [self-hosted]
-    environment: ${{ inputs.environment }}
-    if: always()
-
-    steps:
-      # Save reports as artifact
-      - uses: actions/upload-artifact@v4
-        with:
-          name: REPORTS-${{ github.run_id }}.${{ github.run_number }}.zip
-          path: reports
-
-      # Also zip reports for S3
-      - name: Create zip file for S3
-        run: |
-          if [ -d "reports" ] && [ "$(ls -A reports)" ]; then
-            zip -r REPORTS-${{ github.run_id }}.${{ github.run_number }}.zip reports/
-            echo "zip_created=true" >> $GITHUB_OUTPUT
-            echo "Reports zipped successfully"
-          else
-            echo "zip_created=false" >> $GITHUB_OUTPUT
-            echo "No reports directory found or directory is empty - skipping zip creation"
-          fi
-          
-      # Configure AWS credentials for S3 upload
-      - name: Configure AWS credentials
-        if: steps.create_zip.outputs.zip_created == 'true'
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
-
-      # Upload to S3
-      - name: Upload reports to S3
-        if: steps.create_zip.outputs.zip_created == 'true'
-        run: |
-          aws s3 cp REPORTS-${{ github.run_id }}.${{ github.run_number }}.zip \
-            s3://${{ secrets.AWS_S3_BUCKET }}/gha_postgres_reports/${{ inputs.environment }}/ \
-            --metadata "run-id=${{ github.run_id }},run-number=${{ github.run_number }},environment=${{ inputs.environment }}"
+    - name: Upload Reports Artifact
+      if: always()
+      uses: ./.github/workflows/upload-reports
+      with:
+        job-type: deploy
+        upload-s3: true

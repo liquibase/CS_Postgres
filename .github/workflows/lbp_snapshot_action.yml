@@ -1,9 +1,9 @@
 ####################################################################
-#  GitHub Action to take snapshot for use in Drift Detection
-#  database changes using Liquibase Pro and S3.
+#  GitHub Action to perform an environment-targeted snapshot of
+#  a database using Liquibase Pro, Liquibase Pro Flows, and S3.
 #####################################################################
-name: 'Liquibase Pro Snapshot Job'
-run-name: ${{ inputs.environment}} snapshot by ${{ github.actor }}
+name: 'Liquibase Pro Snapshot'
+run-name: ${{ inputs.environment}} rollback by ${{ github.actor }}
 
 on:
 
@@ -12,16 +12,9 @@ on:
     inputs:
       # The type 'environment' will automatically pull in the environments created in GitHub
       environment:
-        description: 'Environment to snapshot'
+        description: 'Environment for rollback'
         type: environment
-        required: true
-      # For more info on log level, see: https://docs.liquibase.com/parameters/log-level.html
-      log-level:
-        description: 'Liquibase log level'
-        required: false
-        default: 'INFO'
-        type: choice
-        options: [ 'SEVERE','WARNING','INFO','FINE','OFF' ]
+        required: true     
 
 ####################################################################
 #  Set up the environment
@@ -33,6 +26,7 @@ env:
   # AWS Access credentials use by the Liquibase Pro S3 Extension
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
 
   # Default AWS region
   AWS_REGION: us-east-1
@@ -48,50 +42,37 @@ env:
   # Credentials for the environment's database https://docs.liquibase.com/parameters/command-parameters.html
   LIQUIBASE_COMMAND_USERNAME: ${{ secrets.LIQUIBASE_USERNAME }}
   LIQUIBASE_COMMAND_PASSWORD: ${{ secrets.LIQUIBASE_PASSWORD }}
-  
+
   # Liquibase schema: Specified to allow flexibility in storage of Liquibase Change Tracking Tables
   # See https://docs.liquibase.com/parameters/liquibase-schema-name.html
-  LIQUIBASE_LIQUIBASE_SCHEMA_NAME: abc
+  LIQUIBASE_LIQUIBASE_SCHEMA_NAME: LB
   
   # Default schema: Specify schema for all changes
-  LIQUIBASE_COMMAND_DEFAULT_SCHEMA_NAME: abc
+  # LIQUIBASE_COMMAND_DEFAULT_SCHEMA_NAME: Sales
+  # LIQUIBASE_COMMAND_REFERENCE_DEFAULT_SCHEMA_NAME: Sales
 
   # Search path (See https://docs.liquibase.com/concepts/changelogs/how-liquibase-finds-files.html)
-  LIQUIBASE_SEARCH_PATH: src/main/resources/changelogs,s3://${{ secrets.AWS_S3_BUCKET }}/static/flows/
-
-  # The database changelog. See https://docs.liquibase.com/concepts/changelogs/working-with-changelogs.html
-  LIQUIBASE_COMMAND_CHANGELOG_FILE: "root.yaml"
+  LIQUIBASE_SEARCH_PATH: flows, checks, changelogs
   
-  # Location where to store snapshot
-  LB_SNAPSHOT_OUTPUT_FILE: s3://${{ secrets.AWS_S3_BUCKET }}/snapshots/${{ inputs.environment }}-snapshot.json
+  ENVIRONMENT: ${{ inputs.environment }}
   
-  # Logging settings
-  LIQUIBASE_REPORTS_ENABLED: true
-  LIQUIBASE_REPORTS_PATH: reports
-  LIQUIBASE_SHOW_BANNER: false
-  LIQUIBASE_LOG_FORMAT: JSON_PRETTY
-  LIQUIBASE_LOG_FILE: logs/log.json
-  LIQUIBASE_LOG_LEVEL: ${{ inputs.log-level || 'SEVERE' }}
+  # Values: OFF, SEVERE, WARNING, INFO, FINE
+  LIQUIBASE_LOG_LEVEL: INFO
+  LB_SCHEMAS: "DBO,Sales"
 
 jobs:
   #########################################################################
   #  Snapshot
   #########################################################################
 
-  snapshot:
+  database-snapshot:
     runs-on: [self-hosted]
     environment: ${{ inputs.environment }}
-
     steps:
-      # Clean the workspace to help clean up self-Hosted runners prior to deployment
-      - uses: AutoModality/action-clean@v1
-
-        # Check out the source code
-      - name: Checkout repo
-        uses: actions/checkout@v3
-        
-        # Execute the Flow file
-      - name: Take snapshot
-        run: |
-          liquibase snapshot --snapshot-format=json --output-file=${{ env.LB_SNAPSHOT_OUTPUT_FILE }}
-             
+    - uses: actions/checkout@v4
+    
+    - name: Setup Liquibase Environment
+      uses: ./.github/workflows/setup-liquibase
+ 
+    - name: Liquibase Rollback Flow
+      run: liquibase flow --classpath=liquibase-aws-extension.jar --flow-file=liquibase-snapshot.flowfile.yaml
