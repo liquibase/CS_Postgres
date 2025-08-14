@@ -10,7 +10,7 @@ create table Contacts4 (
 
 --changeset amy.smith:sales_contacts4_idx labels:abc-002
 CREATE UNIQUE INDEX name4_idx ON Contacts4 (name);
---rollback DROP INDEX name4_idx on Contacts4;
+--rollback DROP INDEX name4_idx;
 
 --changeset amy.smith:Contacts4_delete labels:abc-0002
 delete from Contacts4;
