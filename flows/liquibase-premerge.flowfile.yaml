@@ -40,19 +40,20 @@ stages:
       - type: shell
         command: |
           export PGPASSWORD="${LIQUIBASE_COMMAND_PASSWORD}"
-          pg_dump -h "${LB_HOSTNAME}" -p "${LB_PORT}" -U "${LIQUIBASE_COMMAND_USERNAME}" -d "${LB_DATABASENAME}" -F c -n "${LB_SCHEMAS}" -n "${LIQUIBASE_LIQUIBASE_SCHEMA_NAME}" --schema-only -f "${LB_DATABASENAME}_dump"
-          pg_dump -h "${LB_HOSTNAME}" -p "${LB_PORT}" -U "${LIQUIBASE_COMMAND_USERNAME}" -d "${LB_DATABASENAME}" -F c -n "${LIQUIBASE_LIQUIBASE_SCHEMA_NAME}" -t DATABASECHANGELOG --data-only -f "${LB_DATABASENAME}_dbcl_data"
+          pg_dump -h dmc-db.liquibase.net -p 5432 -U postgres -d demo_db_dev -F c -n gha -n gha --schema-only -f demo_db_dev_dump
+          # pg_dump -h "${LB_HOSTNAME}" -p "${LB_PORT}" -U "${LIQUIBASE_COMMAND_USERNAME}" -d "${LB_DATABASENAME}" -F c -n "${LB_SCHEMAS}" -n "${LIQUIBASE_LIQUIBASE_SCHEMA_NAME}" --schema-only -f "${LB_DATABASENAME}_dump"
+          # pg_dump -h "${LB_HOSTNAME}" -p "${LB_PORT}" -U "${LIQUIBASE_COMMAND_USERNAME}" -d "${LB_DATABASENAME}" -F c -n "${LIQUIBASE_LIQUIBASE_SCHEMA_NAME}" -t DATABASECHANGELOG --data-only -f "${LB_DATABASENAME}_dbcl_data"
           
-          psql -h "${LB_HOSTNAME}" -p "${LB_PORT}" -U "${LIQUIBASE_COMMAND_USERNAME}" -d "${LB_DATABASENAME}" -c "CREATE DATABASE ${LB_DATABASENAME}_eph;"
+          # psql -h "${LB_HOSTNAME}" -p "${LB_PORT}" -U "${LIQUIBASE_COMMAND_USERNAME}" -d "${LB_DATABASENAME}" -c "CREATE DATABASE ${LB_DATABASENAME}_eph;"
           # Loop through each schema in the list
           for schema in "${LB_SCHEMAS}"; do
             echo "Creating schema: $schema"
-            psql -h "${LB_HOSTNAME}" -p "${LB_PORT}" -U "${LIQUIBASE_COMMAND_USERNAME}" -d "${LB_DATABASENAME}_eph" -c "CREATE SCHEMA IF NOT EXISTS $schema;"
+            # psql -h "${LB_HOSTNAME}" -p "${LB_PORT}" -U "${LIQUIBASE_COMMAND_USERNAME}" -d "${LB_DATABASENAME}_eph" -c "CREATE SCHEMA IF NOT EXISTS $schema;"
           done
-          psql -h "${LB_HOSTNAME}" -p "${LB_PORT}" -U "${LIQUIBASE_COMMAND_USERNAME}" -d "${LB_DATABASENAME}_eph" -c "CREATE SCHEMA IF NOT EXISTS ${LIQUIBASE_LIQUIBASE_SCHEMA_NAME};"
+          # psql -h "${LB_HOSTNAME}" -p "${LB_PORT}" -U "${LIQUIBASE_COMMAND_USERNAME}" -d "${LB_DATABASENAME}_eph" -c "CREATE SCHEMA IF NOT EXISTS ${LIQUIBASE_LIQUIBASE_SCHEMA_NAME};"
           
-          pg_restore -h "${LB_HOSTNAME}" -p "${LB_PORT}" -U "${LIQUIBASE_COMMAND_USERNAME}" -d "${LB_DATABASENAME}_eph" -F c -n "${LB_SCHEMAS}" -n "${LIQUIBASE_LIQUIBASE_SCHEMA_NAME}" --schema-only "${LB_DATABASENAME}_dump"
-          pg_restore -h "${LB_HOSTNAME}" -p "${LB_PORT}" -U "${LIQUIBASE_COMMAND_USERNAME}" -d "${LB_DATABASENAME}_eph" -F c -n "${LIQUIBASE_LIQUIBASE_SCHEMA_NAME}" --data-only "${LB_DATABASENAME}_dbcl_data"
+          # pg_restore -h "${LB_HOSTNAME}" -p "${LB_PORT}" -U "${LIQUIBASE_COMMAND_USERNAME}" -d "${LB_DATABASENAME}_eph" -F c -n "${LB_SCHEMAS}" -n "${LIQUIBASE_LIQUIBASE_SCHEMA_NAME}" --schema-only "${LB_DATABASENAME}_dump"
+          # pg_restore -h "${LB_HOSTNAME}" -p "${LB_PORT}" -U "${LIQUIBASE_COMMAND_USERNAME}" -d "${LB_DATABASENAME}_eph" -F c -n "${LIQUIBASE_LIQUIBASE_SCHEMA_NAME}" --data-only "${LB_DATABASENAME}_dbcl_data"
         
   # Deploy to ephemeral database
   Tag-and-Deploy-to-EphemeralDB:
