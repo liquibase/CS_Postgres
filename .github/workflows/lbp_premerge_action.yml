@@ -98,6 +98,7 @@ jobs:
       run: |
         echo "Installing PostgreSQL 14 client tools..."
         sudo yum install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+        sudo yum install -y https://download.postgresql.org/pub/repos/yum/14/redhat/rhel-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm
         sudo yum install -y postgresql14 postgresql14-libs
         echo "/usr/pgsql-14/bin" >> $GITHUB_PATH
 
