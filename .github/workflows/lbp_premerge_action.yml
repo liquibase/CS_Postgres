@@ -97,11 +97,11 @@ jobs:
     - name: Install Postgres Client Tools
       run: |
         echo "Installing PostgreSQL 15 client tools..."
-        sudo dnf -qy module disable postgresql
-        sudo dnf install -y https://download.postgresql.org/pub/repos/yum/15/redhat/rhel-9-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+        sudo dnf install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-9-x86_64/pgdg-redhat-repo-latest.noarch.rpm
         sudo dnf install -y postgresql15 postgresql15-libs
-        which pg_dump
-        echo "/usr/pgsql-15/bin" >> $GITHUB_PATH
+        echo "/usr/bin/pg_dump" >> $GITHUB_PATH
+        echo "/usr/bin/pg_restore" >> $GITHUB_PATH
+        echo "/usr/bin/psql" >> $GITHUB_PATH
 
     - name: Check PG client tools installation
       run: |
