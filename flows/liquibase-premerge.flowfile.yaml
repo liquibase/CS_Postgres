@@ -72,8 +72,9 @@ stages:
         
 endStage:
   actions:
-    # Drop Ephemeral Database if it exists   
+   # Drop Ephemeral Database if it exists   
     - type: shell
-       command: |
-         export PGPASSWORD="${LIQUIBASE_COMMAND_PASSWORD}"
-         psql -h "${LB_HOSTNAME}" -p "${LB_PORT}" -U "${LIQUIBASE_COMMAND_USERNAME}" -d "${LB_DATABASENAME}" -c "DROP DATABASE IF EXISTS demo_db_dev_eph;"
+      command: |
+        export PGPASSWORD="${LIQUIBASE_COMMAND_PASSWORD}"
+        psql -h "${LB_HOSTNAME}" -p "${LB_PORT}" -U "${LIQUIBASE_COMMAND_USERNAME}" -d "${LB_DATABASENAME}" -c "DROP DATABASE IF EXISTS demo_db_dev_eph;"
+
