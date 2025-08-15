@@ -50,6 +50,10 @@ env:
   LIQUIBASE_COMMAND_USERNAME: ${{ secrets.LIQUIBASE_USERNAME }}
   LIQUIBASE_COMMAND_PASSWORD: ${{ secrets.LIQUIBASE_PASSWORD }}
 
+  # Default schema: Default schema to use for database connection
+  # See https://docs.liquibase.com/parameters/home.html
+  LIQUIBASE_COMMAND_DEFAULT_SCHEMA_NAME: gha
+
   # Liquibase schema: Specified to allow flexibility in storage of Liquibase Change Tracking Tables
   # See https://docs.liquibase.com/parameters/liquibase-schema-name.html
   LIQUIBASE_LIQUIBASE_SCHEMA_NAME: gha
