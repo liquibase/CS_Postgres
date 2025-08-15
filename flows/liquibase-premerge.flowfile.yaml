@@ -39,9 +39,9 @@ stages:
     actions:
       - type: shell
         command: |
-          export PGPASSWORD='${LIQUIBASE_COMMAND_PASSWORD}'
-          pg_dump -h ${LB_HOSTNAME} -p ${LB_PORT} -U ${LIQUIBASE_COMMAND_USERNAME} -d ${LB_DATABASENAME} -F c -n ${LB_SCHEMAS} -n ${LIQUIBASE_LIQUIBASE_SCHEMA_NAME} --schema-only -f ${LB_DATABASENAME}_dump
-          pg_dump -h ${LB_HOSTNAME} -p ${LB_PORT} -U ${LIQUIBASE_COMMAND_USERNAME} -d ${LB_DATABASENAME} -F c -n ${LIQUIBASE_LIQUIBASE_SCHEMA_NAME} -t DATABASECHANGELOG --data-only -f ${LB_DATABASENAME}_dbcl_data
+          export PGPASSWORD="${LIQUIBASE_COMMAND_PASSWORD}"
+          pg_dump -h "${LB_HOSTNAME}" -p "${LB_PORT}" -U "${LIQUIBASE_COMMAND_USERNAME}" -d "${LB_DATABASENAME}" -F c -n "${LB_SCHEMAS}" -n "${LIQUIBASE_LIQUIBASE_SCHEMA_NAME}" --schema-only -f "${LB_DATABASENAME}_dump"
+          pg_dump -h "${LB_HOSTNAME}" -p "${LB_PORT}" -U "${LIQUIBASE_COMMAND_USERNAME}" -d "${LB_DATABASENAME}" -F c -n "${LIQUIBASE_LIQUIBASE_SCHEMA_NAME}" -t DATABASECHANGELOG --data-only -f "${LB_DATABASENAME}_dbcl_data"
           
           psql -h ${LB_HOSTNAME} -p ${LB_PORT} -U ${LIQUIBASE_COMMAND_USERNAME} -d ${LB_DATABASENAME} -c "CREATE DATABASE ${LB_DATABASENAME}_eph;"
           # Loop through each schema in the list
