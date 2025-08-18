@@ -7,7 +7,6 @@ name: 'Liquibase Pro Deploy Job'
 run-name: ${{ inputs.environment}} deployment of current repo by ${{ github.actor }}
 
 on:
-
   workflow_dispatch:
     # Following are the inputs received via the GitHubActions Run workflow dialog
     inputs:
@@ -71,12 +70,16 @@ env:
   
   ENVIRONMENT: ${{ inputs.environment }}
   LB_TAG: ${{ github.event.inputs.lb_tag || github.ref_name }}
+  LB_CHECK_DRIFT: ${{ github.event.inputs.check_drift }}
+  LB_SCHEMAS: "gha,abc"
+  
   # LIQUIBASE_REPORT_PATH: s3://${{ secrets.AWS_S3_BUCKET }}/gha_postgres_reports
   LIQUIBASE_REPORT_PATH: reports
+  
   # Values: OFF, SEVERE, WARNING, INFO, FINE
   LIQUIBASE_LOG_LEVEL: INFO
-  LB_CHECK_DRIFT: ${{ github.event.inputs.check_drift }}
-  LB_SCHEMAS: "gha"
+  LIQUIBASE_LOG_FORMAT: JSON_PRETTY
+  LIQUIBASE_LOG_FILE: logs/log.json
 
 jobs:
   #########################################################################
