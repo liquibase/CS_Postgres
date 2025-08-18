@@ -9,7 +9,6 @@ name: 'Liquibase Pro Premerge Job - Postgres'
 run-name: premerge of current repo by ${{ github.actor }}
 
 on:
-
   workflow_dispatch:
     # Following are the inputs received via the GitHubActions Run workflow dialog
     inputs:
@@ -69,19 +68,21 @@ env:
   
   ENVIRONMENT: DEV
   LB_TAG: ${{ github.ref_name }}
+  LB_SCHEMAS: "gha,abc"
 
   # LIQUIBASE_REPORT_PATH: s3://${{ secrets.AWS_S3_BUCKET }}/gha_reports
   LIQUIBASE_REPORT_PATH: reports
   
   # Values: OFF, SEVERE, WARNING, INFO, FINE
   LIQUIBASE_LOG_LEVEL: INFO
+  LIQUIBASE_LOG_FORMAT: JSON_PRETTY
+  LIQUIBASE_LOG_FILE: logs/log.json
   
   # Prevalidate Settings
   LB_DATABASENAME: "${{ secrets.LB_DATABASENAME }}"
   LB_HOSTNAME: "${{ secrets.LB_HOSTNAME }}"
   LB_PORT: "${{ secrets.LB_PORT }}"
   LB_CLONED_URL: "jdbc:postgresql://${{ secrets.LB_HOSTNAME }}:${{ secrets.LB_PORT }}/${{ secrets.LB_DATABASENAME }}_eph"
-  LB_SCHEMAS: "gha"
 
 jobs:
   #########################################################################
