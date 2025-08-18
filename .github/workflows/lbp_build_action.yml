@@ -6,7 +6,6 @@ name: 'Liquibase Pro Build Job'
 run-name: ${{ inputs.environment}} build of current repo by ${{ github.actor }}
 
 on:
-
   workflow_dispatch:
     # Following are the inputs received via the GitHubActions Run workflow dialog
     inputs:
@@ -73,6 +72,8 @@ env:
   
   # Values: OFF, SEVERE, WARNING, INFO, FINE
   LIQUIBASE_LOG_LEVEL: INFO
+  LIQUIBASE_LOG_FORMAT: JSON_PRETTY
+  LIQUIBASE_LOG_FILE: logs/log.json
 
 jobs:
   #########################################################################
