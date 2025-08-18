@@ -6,7 +6,6 @@ name: 'Liquibase Pro Rollback'
 run-name: ${{ inputs.environment}} rollback by ${{ github.actor }}
 
 on:
-
   workflow_dispatch:
     # Following are the inputs received via the GitHubActions Run workflow dialog
     inputs:
@@ -74,13 +73,15 @@ env:
   
   ROLLBACK_TYPE: ${{ github.event.inputs.rollback_type }}
   LB_TAG_OR_LABEL: ${{ github.event.inputs.lb_tag_or_label }}
+  LB_SCHEMAS: "gha,abc"
   
   #LIQUIBASE_REPORT_PATH: s3://${{ secrets.AWS_S3_BUCKET }}/gha_reports
   LIQUIBASE_REPORT_PATH: reports
   
   # Values: OFF, SEVERE, WARNING, INFO, FINE
   LIQUIBASE_LOG_LEVEL: INFO
-  LB_SCHEMAS: "gha"
+  LIQUIBASE_LOG_FORMAT: JSON_PRETTY
+  LIQUIBASE_LOG_FILE: logs/log.json
 
 jobs:
   #########################################################################
