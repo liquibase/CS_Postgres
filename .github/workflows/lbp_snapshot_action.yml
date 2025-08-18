@@ -54,7 +54,7 @@ env:
   LIQUIBASE_SEARCH_PATH: flows, checks, changelogs
   
   ENVIRONMENT: ${{ inputs.environment }}
-  LB_SCHEMAS: "gha"
+  LB_SCHEMAS: "gha,abc"
   
   # Values: OFF, SEVERE, WARNING, INFO, FINE
   LIQUIBASE_LOG_LEVEL: INFO
