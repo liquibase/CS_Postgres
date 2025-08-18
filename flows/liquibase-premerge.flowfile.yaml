@@ -45,6 +45,7 @@ stages:
           
           psql -h "${LB_HOSTNAME}" -p "${LB_PORT}" -U "${LIQUIBASE_COMMAND_USERNAME}" -d "${LB_DATABASENAME}" -c "CREATE DATABASE ${LB_DATABASENAME}_eph;"
           # Loop through each schema in the list
+          echo "Schema List: ${LB_SCHEMAS}"
           for schema in "${LB_SCHEMAS}"; do
             echo "Creating schema: $schema"
             psql -h "${LB_HOSTNAME}" -p "${LB_PORT}" -U "${LIQUIBASE_COMMAND_USERNAME}" -d "${LB_DATABASENAME}_eph" -c "CREATE SCHEMA IF NOT EXISTS $schema;"
