@@ -6,7 +6,6 @@ name: 'Liquibase Pro Snapshot'
 run-name: ${{ inputs.environment}} rollback by ${{ github.actor }}
 
 on:
-
   workflow_dispatch:
     # Following are the inputs received via the GitHubActions Run workflow dialog
     inputs:
@@ -55,10 +54,12 @@ env:
   LIQUIBASE_SEARCH_PATH: flows, checks, changelogs
   
   ENVIRONMENT: ${{ inputs.environment }}
+  LB_SCHEMAS: "gha"
   
   # Values: OFF, SEVERE, WARNING, INFO, FINE
   LIQUIBASE_LOG_LEVEL: INFO
-  LB_SCHEMAS: "gha"
+  LIQUIBASE_LOG_FORMAT: JSON_PRETTY
+  LIQUIBASE_LOG_FILE: logs/log.json
 
 jobs:
   #########################################################################
