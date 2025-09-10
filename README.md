@@ -7,42 +7,7 @@ This repository implements a comprehensive Liquibase Pro workflow using GitHub A
 
 ## Available Pipeline Actions
 
-### 1. **Build** (`lbp_build_action.yml`)
-**Purpose**: Performs initial database deployment to development environment
-
-**Workflow**:
-- Runs Policy Checks with `liquibase-checks.flowfile.yaml`
-- **Non-blocking Policy Checks**: Build continues even if policies fail
-- Executes Build Flow using `liquibase-build.flowfile.yaml`
-- Deploys changes to the first database environment (typically DEV)
-- Uploads reports and artifacts to S3
-
-**Trigger**: Manual workflow dispatch with environment selection
-
-**Key Features**:
-- Environment-specific configuration through GitHub environments
-- Optional tagging support for builds
-- Comprehensive logging in JSON format
-
-### 2. **Deploy** (`lbp_deploy_action.yml`)
-**Purpose**: Environment-targeted deployment with conditional approval workflow
-
-**Workflow**:
-1. **Policy Checks Job**: Runs `liquibase-checks.flowfile.yaml` and sets approval flags
-2. **Manual Approval Job**: Activated only if policy checks fail
-3. **Deploy Job**: Executes `liquibase-deploy.flowfile.yaml` deployment
-
-**Conditional Logic**:
-- ✅ **Policy Checks Pass**: Deployment proceeds automatically
-- ❌ **Policy Checks Fail**: Manual approval required via `manual-approval` environment
-- Deployment only runs after successful approval or if checks passed
-
-**Features**:
-- Drift detection option
-- Multi-environment support with environment-specific secrets
-- Comprehensive approval workflow for production safety
-
-### 3. **Premerge** (`lbp_premerge_action.yml`) 
+### 1. **Premerge** (`lbp_premerge_action.yml`) 
 **Purpose**: Pre-merge validation using temporary ephemeral database
 
 **Workflow**:
@@ -64,6 +29,41 @@ This repository implements a comprehensive Liquibase Pro workflow using GitHub A
 - Uses PostgreSQL client tools (`pg_dump`, `psql`) for database cloning
 - Creates separate database with `_eph` suffix
 - Includes both schema and changelog history in clone
+
+### 2. **Build** (`lbp_build_action.yml`)
+**Purpose**: Performs initial database deployment to development environment
+
+**Workflow**:
+- Runs Policy Checks with `liquibase-checks.flowfile.yaml`
+- **Non-blocking Policy Checks**: Build continues even if policies fail
+- Executes Build Flow using `liquibase-build.flowfile.yaml`
+- Deploys changes to the first database environment (typically DEV)
+- Uploads reports and artifacts to S3
+
+**Trigger**: Manual workflow dispatch with environment selection
+
+**Key Features**:
+- Environment-specific configuration through GitHub environments
+- Optional tagging support for builds
+- Comprehensive logging in JSON format
+
+### 3. **Deploy** (`lbp_deploy_action.yml`)
+**Purpose**: Environment-targeted deployment with conditional approval workflow
+
+**Workflow**:
+1. **Policy Checks Job**: Runs `liquibase-checks.flowfile.yaml` and sets approval flags
+2. **Manual Approval Job**: Activated only if policy checks fail
+3. **Deploy Job**: Executes `liquibase-deploy.flowfile.yaml` deployment
+
+**Conditional Logic**:
+- ✅ **Policy Checks Pass**: Deployment proceeds automatically
+- ❌ **Policy Checks Fail**: Manual approval required via `manual-approval` environment
+- Deployment only runs after successful approval or if checks passed
+
+**Features**:
+- Drift detection option
+- Multi-environment support with environment-specific secrets
+- Comprehensive approval workflow for production safety
 
 ### 4. **Rollback** (`lbp_rollback_action.yml`)
 **Purpose**: Environment-targeted database rollback operations
@@ -101,9 +101,9 @@ All pipelines integrate Liquibase Policy Checks with different behaviors:
 
 | Pipeline | Policy Check Behavior | Action on Failure |
 |----------|---------------------|------------------|
+| **Premerge** | Non-blocking | ⚠️ Warning logged, validation continues |
 | **Build** | Non-blocking | ⚠️ Warning logged, build continues |
 | **Deploy** | Conditional blocking | 🚫 Manual approval required |
-| **Premerge** | Non-blocking | ⚠️ Warning logged, validation continues |
 | **Rollback** | N/A | Not applicable |
 | **Snapshot** | N/A | Not applicable |
 
