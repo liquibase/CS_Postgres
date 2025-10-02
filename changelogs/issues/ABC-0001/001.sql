@@ -24,6 +24,6 @@ delete from Contacts;
 delete from Contacts;
 --rollback select '1';
 
---changeset amy.smith:contacts_delete_from_3
+--changeset amy.smith:contacts_delete_from_3 labels:abc-0001 
 delete from Contacts;
 --rollback select '1';
