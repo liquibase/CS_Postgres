@@ -61,6 +61,8 @@ env:
   LIQUIBASE_LOG_FORMAT: JSON_PRETTY
   LIQUIBASE_LOG_FILE: logs/log.json
 
+  LIQUIBASE_DBCLHISTORY_ENABLED: true
+
 jobs:
   #########################################################################
   #  Snapshot
