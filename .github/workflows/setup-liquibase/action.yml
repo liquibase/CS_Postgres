@@ -12,12 +12,12 @@ runs:
         java-version: '17'
 
     - name: Setup Liquibase Pro
-      uses: liquibase/setup-liquibase@v1
+      uses: liquibase/setup-liquibase@v2
       with:
-        version: '4.33.0'
-        edition: 'pro'
+        version: '5.0.0'
+        edition: 'secure'
 
-    - name: Download AWS Extension
-      shell: bash
-      run: |
-        wget -O liquibase-aws-extension.jar https://repo1.maven.org/maven2/org/liquibase/ext/liquibase-aws-extension/1.0.1/liquibase-aws-extension-1.0.1.jar
+#    - name: Download AWS Extension
+#      shell: bash
+#      run: |
+#        wget -O liquibase-aws-extension.jar https://repo1.maven.org/maven2/org/liquibase/ext/liquibase-aws-extension/1.0.1/liquibase-aws-extension-1.0.1.jar
