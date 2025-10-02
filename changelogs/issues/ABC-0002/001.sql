@@ -12,14 +12,14 @@ create table Contacts4 (
 CREATE UNIQUE INDEX name4_idx ON Contacts4 (name);
 --rollback DROP INDEX name4_idx;
 
---changeset amy.smith:Contacts4_delete labels:abc-0002
+--changeset amy.smith:Contacts4_delete labels:abc-0002 runAlways=true
 delete from Contacts4;
 --rollback select '1';
 
 --changeset amy.smith:Contacts4_insert labels:abc-0002 runAlways=true
 insert into Contacts4 (id, name, dept) values (1,'Name A','Dept A') ;
---rollback select '1';
+--rollback delete from Contacts4 where id=1;
 
 --changeset amy.smith:Contacts4_insert2 labels:abc-0002 runAlways=true runOnChange=true
 insert into Contacts4 (id, name, dept) values (41,'Patty Smith','Rocker') ;
---rollback empty
+--rollback delete from Contacts4 where id=41;
