@@ -16,7 +16,7 @@ create table Contacts2 (
 );
 --rollback DROP TABLE Contacts2;
 
---changeset amy.smith:contacts_delete_from_1 runAlways:true
+--changeset amy.smith:contacts_delete_from_1 runAlways:true labels:abc-0001 
 delete from Contacts;
 --rollback select '1';
 
