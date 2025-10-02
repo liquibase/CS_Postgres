@@ -23,3 +23,7 @@ delete from Contacts;
 --changeset amy.smith:contacts_delete_from_2
 delete from Contacts;
 --rollback select '1';
+
+--changeset amy.smith:contacts_delete_from_3
+delete from Contacts;
+--rollback select '1';
