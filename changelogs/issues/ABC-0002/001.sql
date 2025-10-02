@@ -21,5 +21,5 @@ insert into Contacts4 (id, name, dept) values (1,'Name A','Dept A') ;
 --rollback select '1';
 
 --changeset amy.smith:Contacts4_insert2 labels:abc-0002 runAlways=true runOnChange=true
-insert into Contacts4 (id, name, dept) values (41,'Name A balh','Dept A blah') ;
+insert into Contacts4 (id, name, dept) values (41,'Patty Smith','Rocker') ;
 --rollback empty
