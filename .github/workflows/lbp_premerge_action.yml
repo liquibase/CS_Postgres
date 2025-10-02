@@ -107,7 +107,7 @@ jobs:
       continue-on-error: true
       run: | 
         set +e
-        CHECKS_STATUS=$(liquibase flow --classpath=liquibase-aws-extension.jar --flow-file=liquibase-checks.flowfile.yaml 2>&1)
+        CHECKS_STATUS=$(liquibase flow --flow-file=liquibase-checks.flowfile.yaml 2>&1)
         EXIT_CODE=$?
         set -e
         if [ $EXIT_CODE -eq 1 ]; then
@@ -117,7 +117,7 @@ jobs:
         fi
         
     - name: Liquibase Premerge Flow
-      run: liquibase flow --classpath=liquibase-aws-extension.jar --flow-file=liquibase-premerge.flowfile.yaml
+      run: liquibase flow --flow-file=liquibase-premerge.flowfile.yaml
 
     - name: Upload Reports Artifact
       if: always()
