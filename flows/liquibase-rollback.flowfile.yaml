@@ -53,10 +53,11 @@ endStage:
     - type: liquibase
       command: snapshot
       cmdArgs: {  snapshot-format: json, schemas: "${SCHEMAS}"}
-      globalArgs: { output-file: 's3://${BUCKET}/gh_sqlserver_snapshots/${ENV}-snapshot.json' }
+      globalArgs: { output-file: 's3://${BUCKET}/gh_postgres_snapshots/${ENV}-snapshot.json' }
+
         
     - type: shell
-      command: echo 'Updated snapshot saved to s3://${BUCKET}/gh_sqlserver_snapshots/${ENV}-snapshot.json'   
+      command: echo 'Updated snapshot saved to s3://${BUCKET}/gh_postgres_snapshots/${ENV}-snapshot.json'   
 
     - type: liquibase
       command: history
