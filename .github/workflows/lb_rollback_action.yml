@@ -1,26 +1,32 @@
-#############################################################################
-#  GitHub Action to perform a build on the first database, eg. DEV,
-#  using Liquibase Pro, Flows, Policy checks, and S3.
-##############################################################################
-name: 'Liquibase Pro Build Job'
-run-name: ${{ inputs.environment}} build of current repo by ${{ github.actor }}
+####################################################################
+#  GitHub Action to perform an environment-targeted rollback of
+#  database changes using Liquibase Secure, Liquibase Flows, and S3.
+#####################################################################
+name: 'Liquibase Rollback'
+run-name: ${{ inputs.environment}} rollback by ${{ github.actor }}
 
 on:
   workflow_dispatch:
     # Following are the inputs received via the GitHubActions Run workflow dialog
     inputs:
-    
       # The type 'environment' will automatically pull in the environments created in GitHub
       environment:
-        description: 'Environment for build'
+        description: 'Environment for rollback'
         type: environment
         required: true
-        default: DEV
-        
-      lb_tag:
-        description: 'Optional tag for the build'
+
+      rollback_type:
+        description: 'Select an option'
+        type: choice
+        required: true
+        options:
+          - rollback_to_tag
+          - rollback_by_label
+
+      lb_tag_or_label:
+        description: 'Tag or Label for Rollback'
         type: string
-        required: false
+        required: true     
 
 ####################################################################
 #  Set up the environment
@@ -29,7 +35,7 @@ env:
   # AWS S3 bucket is the host part of the S3 bucket
   AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
   
-  # AWS Access credentials use by the Liquibase Pro S3 Extension
+  # AWS Access credentials use by the Liquibase Secure S3 Extension
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
@@ -37,9 +43,9 @@ env:
   # Default AWS region
   AWS_REGION: us-east-1
   
-  # Pro License key
+  # Secure License key
   # See https://docs.liquibase.com/workflows/liquibase-pro/how-to-apply-your-liquibase-pro-license-key.html
-  LIQUIBASE_LICENSE_KEY: ${{ secrets.LIQUIBASE_PRO_LICENSE_KEY }}
+  LIQUIBASE_LICENSE_KEY: ${{ secrets.LIQUIBASE_LICENSE_KEY }}
   
   # JDBC URL of the database per environment
   # See https://docs.liquibase.com/workflows/liquibase-community/using-jdbc-url-in-liquibase.html
@@ -48,7 +54,7 @@ env:
   # Credentials for the environment's database https://docs.liquibase.com/parameters/command-parameters.html
   LIQUIBASE_COMMAND_USERNAME: ${{ secrets.LIQUIBASE_USERNAME }}
   LIQUIBASE_COMMAND_PASSWORD: ${{ secrets.LIQUIBASE_PASSWORD }}
-
+  
   # Liquibase schema: Specified to allow flexibility in storage of Liquibase Change Tracking Tables
   # See https://docs.liquibase.com/parameters/liquibase-schema-name.html
   LIQUIBASE_LIQUIBASE_SCHEMA_NAME: gha
@@ -64,9 +70,11 @@ env:
   LIQUIBASE_COMMAND_CHANGELOG_FILE: changelog.yaml
   
   ENVIRONMENT: ${{ inputs.environment }}
-  BRANCH: ${{ github.ref_name }}
-  LB_TAG: ${{ github.event.inputs.lb_tag || github.ref_name }}
-
+  
+  ROLLBACK_TYPE: ${{ github.event.inputs.rollback_type }}
+  LB_TAG_OR_LABEL: ${{ github.event.inputs.lb_tag_or_label }}
+  LB_SCHEMAS: "gha,abc"
+  
   #LIQUIBASE_REPORT_PATH: s3://${{ secrets.AWS_S3_BUCKET }}/gha_reports
   LIQUIBASE_REPORT_PATH: reports
   LIQUIBASE_DBCLHISTORY_ENABLED: true
@@ -78,10 +86,10 @@ env:
 
 jobs:
   #########################################################################
-  #  Build
+  #  Rollback
   #########################################################################
 
-  database-build:
+  database-rollback:
     runs-on: [self-hosted]
     environment: ${{ inputs.environment }}
     steps:
@@ -89,27 +97,9 @@ jobs:
     
     - name: Setup Liquibase Environment
       uses: ./.github/workflows/setup-liquibase
-
-    - name: Liquibase Checks Flow
-      id: lbp-policy-checks
-      continue-on-error: true
-      run: | 
-        set +e
-        # CHECKS_STATUS=$(liquibase flow --classpath=liquibase-aws-extension.jar --flow-file=liquibase-checks.flowfile.yaml 2>&1)
-        CHECKS_STATUS=$(liquibase flow --flow-file=liquibase-checks.flowfile.yaml 2>&1)
-        EXIT_CODE=$?
-        set -e
-        if [ $EXIT_CODE -eq 1 ]; then
-          echo "::error::Policy checks did not pass, but allowing build to complete."
-          echo "::error::In non-build environments, this deployment will require Manual Approval."
-          exit $EXIT_CODE
-        fi  
-
-    - name: Liquibase Build Flow
-      # run: liquibase flow --classpath=liquibase-aws-extension.jar --flow-file=liquibase-build.flowfile.yaml
-      run: liquibase flow --flow-file=liquibase-build.flowfile.yaml
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Auto-generated
+ 
+    - name: Liquibase Rollback Flow
+      run: liquibase flow --flow-file=liquibase-rollback.flowfile.yaml
 
     - name: Upload Reports Artifact
       if: always()

@@ -1,13 +1,13 @@
 # CS_Postgres
-Demo of reference implementation of Liquibase Pro with GitHub Actions
+Demo of reference implementation of Liquibase Secure with GitHub Actions
 
 ## GitHub Actions Pipeline Overview
 
-This repository implements a comprehensive Liquibase Pro workflow using GitHub Actions with five distinct pipeline actions, each designed for specific database lifecycle management tasks. All pipelines integrate with AWS S3 for artifact storage and reporting.
+This repository implements a comprehensive Liquibase Secure workflow using GitHub Actions with five distinct pipeline actions, each designed for specific database lifecycle management tasks. All pipelines integrate with AWS S3 for artifact storage and reporting.
 
 ## Available Pipeline Actions
 
-### 1. **Premerge** (`lbp_premerge_action.yml`) 
+### 1. **Premerge** (`lb_premerge_action.yml`) 
 **Purpose**: Pre-merge validation using temporary ephemeral database
 
 **Workflow**:
@@ -30,7 +30,7 @@ This repository implements a comprehensive Liquibase Pro workflow using GitHub A
 - Creates separate database with `_eph` suffix
 - Includes both schema and changelog history in clone
 
-### 2. **Build** (`lbp_build_action.yml`)
+### 2. **Build** (`lb_build_action.yml`)
 **Purpose**: Performs initial database deployment to development environment
 
 **Workflow**:
@@ -47,7 +47,7 @@ This repository implements a comprehensive Liquibase Pro workflow using GitHub A
 - Optional tagging support for builds
 - Comprehensive logging in JSON format
 
-### 3. **Deploy** (`lbp_deploy_action.yml`)
+### 3. **Deploy** (`lb_deploy_action.yml`)
 **Purpose**: Environment-targeted deployment with conditional approval workflow
 
 **Workflow**:
@@ -65,7 +65,7 @@ This repository implements a comprehensive Liquibase Pro workflow using GitHub A
 - Multi-environment support with environment-specific secrets
 - Comprehensive approval workflow for production safety
 
-### 4. **Rollback** (`lbp_rollback_action.yml`)
+### 4. **Rollback** (`lb_rollback_action.yml`)
 **Purpose**: Environment-targeted database rollback operations
 
 **Workflow**:
@@ -80,7 +80,7 @@ This repository implements a comprehensive Liquibase Pro workflow using GitHub A
 - Environment-specific rollback targeting
 - Comprehensive rollback reporting
 
-### 5. **Snapshot** (`lbp_snapshot_action.yml`)
+### 5. **Snapshot** (`lb_snapshot_action.yml`)
 **Purpose**: Create database snapshots for documentation and comparison
 
 **Workflow**:

@@ -19,7 +19,3 @@ delete from Contacts4;
 --changeset amy.smith:Contacts4_insert labels:abc-0002 runAlways=true
 insert into Contacts4 (id, name, dept) values (1,'Name A','Dept A') ;
 --rollback delete from Contacts4 where id=1;
-
---changeset amy.smith:Contacts4_insert2 labels:abc-0002 runAlways=true runOnChange=true
-insert into Contacts4 (id, name, dept) values (41,'Patty Smith','Rocker') ;
---rollback delete from Contacts4 where id=41;

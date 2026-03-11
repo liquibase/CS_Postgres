@@ -27,3 +27,15 @@ delete from Contacts;
 --changeset amy.smith:contacts_delete_from_3 labels:abc-0001 
 delete from Contacts;
 --rollback select '1';
+
+--changeset amy.smith:1 labels:@test
+delete from Contacts;
+--rollback select '1';
+
+--changeset amy.smith:2 
+delete from Contacts;
+--rollback select '2';
+
+--changeset amy.smith:3 
+delete from Contacts;
+--rollback select '3';
