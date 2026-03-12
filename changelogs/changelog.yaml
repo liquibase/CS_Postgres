@@ -33,4 +33,4 @@ databaseChangeLog:
       includeAll:
           path: protected_datadml
           relativeToChangelogFile: true
-          errorIfMissingOrEmpty: false
+          errorIfMissingOrEmpty: true
