@@ -28,7 +28,7 @@ on:
 #####################################################################
 permissions:
   id-token: write
-  contents: write
+  contents: write # If not writing back to the repo set to read
 
 ####################################################################
 #  Set up the environment
