@@ -33,4 +33,8 @@ databaseChangeLog:
       includeAll:
           path: protected_datadml
           relativeToChangelogFile: true
+<<<<<<< HEAD
           errorIfMissingOrEmpty: true
+=======
+          errorIfMissingOrEmpty: false
+>>>>>>> ba2b99418b27ccce88ed520c2568d728d4b935de
