@@ -28,7 +28,7 @@ on:
 #####################################################################
 permissions:
   id-token: write
-  contents: read
+  contents: write
 
 ####################################################################
 #  Set up the environment
@@ -85,6 +85,9 @@ env:
   # PSQL values
   LIQUIBASE_PSQL_KEEP_TEMP_PATH: reports
   LIQUIBASE_PSQL_LOG_FILE: output.log
+  
+  # Checks values
+  LIQUIBASE_COMMAND_CHECKS_RUN_AUTO_UPDATE: off
 
 jobs:
   #########################################################################
