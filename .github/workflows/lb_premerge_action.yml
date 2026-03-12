@@ -85,6 +85,10 @@ env:
   LB_PORT: "${{ secrets.LB_PORT }}"
   LB_CLONED_URL: "jdbc:postgresql://${{ secrets.LB_HOSTNAME }}:${{ secrets.LB_PORT }}/${{ secrets.LB_DATABASENAME }}_eph"
 
+  # PSQL values
+  LIQUIBASE_PSQL_KEEP_TEMP_PATH: reports
+  LIQUIBASE_PSQL_LOG_FILE: output.log
+
 jobs:
   #########################################################################
   #  Validation

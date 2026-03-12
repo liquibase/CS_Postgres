@@ -82,6 +82,10 @@ env:
   LIQUIBASE_LOG_FORMAT: JSON_PRETTY
   LIQUIBASE_LOG_FILE: logs/log.json
 
+  # PSQL values
+  LIQUIBASE_PSQL_KEEP_TEMP_PATH: reports
+  LIQUIBASE_PSQL_LOG_FILE: output.log
+
 jobs:
   #########################################################################
   #  Deploy
