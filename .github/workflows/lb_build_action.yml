@@ -113,8 +113,14 @@ jobs:
         role-to-assume: ${{ secrets.AWS_ROLE }}
         aws-region: ${{ vars.AWS_REGION }}
 
+    - name: Debug AWS identity (pre)
+      run: aws sts get-caller-identity
+
     - name: Setup Liquibase Environment
       uses: ./.github/workflows/setup-liquibase
+
+    - name: Debug AWS identity (post)
+      run: aws sts get-caller-identity
 
     - name: Liquibase Checks Flow
       id: lbp-policy-checks
