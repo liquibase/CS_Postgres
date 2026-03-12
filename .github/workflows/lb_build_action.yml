@@ -22,20 +22,26 @@ on:
         type: string
         required: false
 
+
+####################################################################
+### Include permissions for OIDC
+#####################################################################
+permissions:
+  id-token: write
+  contents: read
+
 ####################################################################
 #  Set up the environment
 #####################################################################
 env:
   # AWS S3 bucket is the host part of the S3 bucket
-  AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+  AWS_S3_BUCKET: ${{ vars.AWS_S3_BUCKET }}
+  AWS_REGION: ${{ vars.AWS_REGION }}
   
   # AWS Access credentials use by the Liquibase Secure S3 Extension
-  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
-
-  # Default AWS region
-  AWS_REGION: us-east-1
+  # AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  # AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  # AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
   
   # Secure License key
   # See https://docs.liquibase.com/workflows/liquibase-pro/how-to-apply-your-liquibase-pro-license-key.html
@@ -90,7 +96,20 @@ jobs:
     environment: ${{ inputs.environment }}
     steps:
     - uses: actions/checkout@v4
-    
+
+###
+### Retrieve AWS credentials
+### Requires an AWS IAM role with token.actions.githubusercontent.com web identity provider
+### Provider URL: https://token.actions.githubusercontent.com
+### Audience: sts.amazonaws.com
+### Need to grab the license key to install paid version
+###
+    - name: Retrieving AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: ${{ secrets.AWS_ROLE }}
+        aws-region: ${{ vars.AWS_REGION }}
+
     - name: Setup Liquibase Environment
       uses: ./.github/workflows/setup-liquibase
 
