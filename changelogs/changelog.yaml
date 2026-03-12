@@ -21,3 +21,9 @@ databaseChangeLog:
       path: issues
       relativeToChangelogFile: true   
       
+  - modifyChangeSets:
+      runWith: psql
+      includeAll:
+          path: datadml
+          relativeToChangelogFile: true
+          errorIfMissingOrEmpty: false
