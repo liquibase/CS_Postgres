@@ -39,14 +39,6 @@ runs:
           echo "No reports directory found or directory is empty - skipping zip creation"
         fi
 
-    - name: Configure AWS credentials
-      if: inputs.upload-s3 == 'true' && steps.create_zip.outputs.zip_created == 'true'
-      uses: aws-actions/configure-aws-credentials@v4
-      with:
-        aws-access-key-id: ${{ env.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ${{ env.AWS_REGION }}
-
     - name: Upload reports to S3
       if: inputs.upload-s3 == 'true' && steps.create_zip.outputs.zip_created == 'true'
       shell: bash
