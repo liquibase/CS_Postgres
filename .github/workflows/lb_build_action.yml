@@ -38,11 +38,6 @@ env:
   AWS_S3_BUCKET: ${{ vars.AWS_S3_BUCKET }}
   AWS_REGION: ${{ vars.AWS_REGION }}
   
-  # AWS Access credentials use by the Liquibase Secure S3 Extension
-  # AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  # AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  # AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
-  
   # Secure License key
   # See https://docs.liquibase.com/workflows/liquibase-pro/how-to-apply-your-liquibase-pro-license-key.html
   LIQUIBASE_LICENSE_KEY: ${{ secrets.LIQUIBASE_LICENSE_KEY }}
