@@ -27,3 +27,10 @@ databaseChangeLog:
           path: datadml
           relativeToChangelogFile: true
           errorIfMissingOrEmpty: false
+
+  - modifyChangeSets:
+      runWith: psql
+      includeAll:
+          path: protected_datadml
+          relativeToChangelogFile: true
+          errorIfMissingOrEmpty: false
