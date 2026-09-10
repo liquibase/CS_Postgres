@@ -5,3 +5,4 @@ reports/
 data/
 diffchangelogs/
 generatechangelogs/
+output.log/
