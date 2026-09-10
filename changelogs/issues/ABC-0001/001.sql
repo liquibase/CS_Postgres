@@ -16,11 +16,13 @@ create table Contacts2 (
 );
 --rollback DROP TABLE Contacts2;
 
---changeset amy.smith:contacts_insert
-insert into contacts (id, name, dept) values (100, 'CS', '123456');
-insert into contacts (id, name, dept) values (200, 'Finance', '123457');
+--changeset amy.smith:contacts_insert_jdbc
+insert into contacts (id, name, dept) values (101, 'CS', '123456');
+insert into contacts (id, name, dept) values (201, 'Finance', '123457');
 --rollback delete from contacts where id in (100,200);
 
---changeset amy.smith:contacts_update runAlways:true runOnChange:true
+--changeset amy.smith:contacts_update_jdbc runOnChange:true
 update contacts set dept = 'Blah';
 --rollback
+
+--include file:test_scripts/Apr_Release_I.sql
