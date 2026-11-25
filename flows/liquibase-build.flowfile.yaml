@@ -6,7 +6,7 @@
 ## or your flow file can have multiple stages with fewer actions in each stage.
 globalVariables:
   TAG: ${LB_TAG}
-  BRANCH: ${BRANCH}
+  ENV: ${ENVIRONMENT}
   HISTORY_COUNT: ${LB_HISTORY_COUNT}
   
 stages:
