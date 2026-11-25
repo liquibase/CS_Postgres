@@ -130,6 +130,13 @@ jobs:
       with:
         ca-cert-path: certs/cs-ci-ca.cer
 
+    - name: Debug connectivity
+      run: |
+        hostname
+        grep cs-ci /etc/hosts || echo "No hosts entry visible to this job"
+        getent hosts cs-ci.liquibase.net || echo "Name does not resolve"
+        curl -sv -o /dev/null --max-time 15 https://cs-ci.liquibase.net/api/licenses/access
+
     - name: Liquibase Build Flow
       run: liquibase flow --flow-file=liquibase-build.flowfile.yaml
       env:
