@@ -39,6 +39,18 @@ insert into contacts (id, name, dept) values (11, 'Finance', '123457');
 --rollback delete from contacts where id in (10,11);
 
 --changeset amy.smith:contacts_insert5 runOnChange:true
-insert into contacts (id, name, dept) values (bad, 'CS', '123456');
+insert into contacts (id, name, dept) values (13, 'CS', '123456');
 insert into contacts (id, name, dept) values (12, 'Finance', '123457');
---rollback delete from contacts where id in (12);
+--rollback delete from contacts where id in (12,13);
+
+--changeset amy.smith:row_counts_test_01
+insert into abc.contacts (id, name, dept) values (14, 'CS', '141414');
+--rollback delete from abc.contacts where id=14;
+
+--changeset amy.smith:row_counts_test_02
+insert into abc.contacts (id, name, dept) values (15, 'CS', '151515');
+--rollback delete from abc.contacts where id=15;
+
+--changeset amy.smith:row_counts_test_03
+update abc.contacts set name = 'Customer Success' where id in (14,15);
+--rollback update abc.contacts set name = 'CS' where id in (14,15);

@@ -34,13 +34,23 @@ permissions:
 #  Set up the environment
 #####################################################################
 env:
+
+  # Liquibase Platform Settings
+  LIQUIBASE_PLATFORM_ENABLED: true
+  LIQUIBASE_PLATFORM_API_URL: https://cs-ci.liquibase.net/api/operations/ingest
+  LIQUIBASE_PLATFORM_API_KEY: ${{ secrets.LIQUIBASE_PLATFORM_API_KEY }}
+  LIQUIBASE_PLATFORM_CONNECTION_IDENTIFIER: ${{ vars.LIQUIBASE_PLATFORM_CONNECTION_IDENTIFIER }}
+  LIQUIBASE_PLATFORM_CHANGELOG_IDENTIFIER: ${{ vars.LIQUIBASE_PLATFORM_CHANGELOG_IDENTIFIER }}
+
+  # Liquibase License Tracking Settings (also needs PLATFORM_API_KEY from above)
+  LIQUIBASE_LICENSE_TRACKING_ENABLED: true
+  LIQUIBASE_LICENSE_ENDPOINT_URL: https://cs-ci.liquibase.net/api/licenses/access
+  # Optional fallback if the endpoint is unreachable:
+  # LIQUIBASE_LICENSE_KEY: ${{ secrets.LIQUIBASE_LICENSE_KEY }}
+
   # AWS S3 bucket is the host part of the S3 bucket
   AWS_S3_BUCKET: ${{ vars.AWS_S3_BUCKET }}
   AWS_REGION: ${{ vars.AWS_REGION }}
-  
-  # Secure License key
-  # See https://docs.liquibase.com/workflows/liquibase-pro/how-to-apply-your-liquibase-pro-license-key.html
-  LIQUIBASE_LICENSE_KEY: ${{ secrets.LIQUIBASE_LICENSE_KEY }}
   
   # JDBC URL of the database per environment
   # See https://docs.liquibase.com/workflows/liquibase-community/using-jdbc-url-in-liquibase.html
@@ -64,25 +74,32 @@ env:
   # The database changelog. See https://docs.liquibase.com/concepts/changelogs/working-with-changelogs.html
   LIQUIBASE_COMMAND_CHANGELOG_FILE: changelog.yaml
   
+  # Environment, Branch, and Tag information
   ENVIRONMENT: ${{ inputs.environment }}
   BRANCH: ${{ github.ref_name }}
   LB_TAG: ${{ github.event.inputs.lb_tag || github.ref_name }}
 
-  #LIQUIBASE_REPORT_PATH: s3://${{ secrets.AWS_S3_BUCKET }}/gha_reports
+  # Reports
   LIQUIBASE_REPORT_PATH: reports
-  LIQUIBASE_DBCLHISTORY_ENABLED: true
   
   # Values: OFF, SEVERE, WARNING, INFO, FINE
   LIQUIBASE_LOG_LEVEL: INFO
-  #LIQUIBASE_LOG_FORMAT: JSON_PRETTY
-  #LIQUIBASE_LOG_FILE: logs/log.json
+  LIQUIBASE_LOG_FORMAT: JSON_PRETTY
+  LIQUIBASE_LOG_FILE: logs/log.json
   
   # PSQL values
   LIQUIBASE_PSQL_KEEP_TEMP_PATH: reports
   LIQUIBASE_PSQL_LOG_FILE: output.log
   
-  # Checks values
+  # DBCL / History Settings
+  LIQUIBASE_DBCLHISTORY_ENABLED: true
+  LB_HISTORY_COUNT: 50
+
+  # Checks Settings
   LIQUIBASE_COMMAND_CHECKS_RUN_AUTO_UPDATE: off
+  LIQUIBASE_COMMAND_CHECKS_RUN_CHECKS_SCRIPTS_ENABLED: true
+  LIQUIBASE_COMMAND_CHECKS_RUN_ASSIGNMENT_ID: ${{ vars.LIQUIBASE_COMMAND_CHECKS_ASSIGNMENT_ID }}
+  LIQUIBASE_COMMAND_CHECKS_SHOW_ASSIGNMENT_ID: ${{ vars.LIQUIBASE_COMMAND_CHECKS_ASSIGNMENT_ID }}
 
 jobs:
   #########################################################################
@@ -110,27 +127,8 @@ jobs:
 
     - name: Setup Liquibase Environment
       uses: ./.github/workflows/setup-liquibase
-
-    - name: Liquibase Checks Flow
-      id: lbp-policy-checks
-      continue-on-error: true
-      run: | 
-        set +e
-        # CHECKS_STATUS=$(liquibase flow --classpath=liquibase-aws-extension.jar --flow-file=liquibase-checks.flowfile.yaml 2>&1)
-        CHECKS_STATUS=$(liquibase flow --flow-file=liquibase-checks.flowfile.yaml 2>&1)
-        EXIT_CODE=$?
-        set -e
-        if [ $EXIT_CODE -eq 1 ]; then
-          echo "::error::Policy checks did not pass, but allowing build to complete."
-          echo "::error::In non-build environments, this deployment will require Manual Approval."
-          exit $EXIT_CODE
-        fi  
-
-    - name: Configure Git for Actions
-      run: |
-        git config --global user.name "github-actions[bot]"
-        git config --global user.email "github-actions[bot]@users.noreply.github.com"
-        git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+      with:
+        ca-cert-path: certs/cs-ci-ca.cer
 
     - name: Liquibase Build Flow
       run: liquibase flow --flow-file=liquibase-build.flowfile.yaml

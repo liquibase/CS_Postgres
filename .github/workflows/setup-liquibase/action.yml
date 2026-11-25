@@ -1,6 +1,18 @@
 # .github/workflows/setup-liquibase/action.yml
 name: 'Setup Liquibase Environment'
-description: 'Sets up Java and Liquibase Secure'
+description: 'Sets up Java and Liquibase Secure, and optionally trusts a CA certificate for the Liquibase Platform'
+
+inputs:
+  ca-cert-path:
+    description: >
+      Path (relative to the repo root) to a CA certificate the JDK should trust,
+      e.g. when your Change Intelligence endpoint uses a private CA. Leave empty to skip.
+    required: false
+    default: ''
+  ca-cert-alias:
+    description: 'Alias for the certificate in the JDK truststore'
+    required: false
+    default: 'liquibase-ci-ca'
 
 runs:
   using: 'composite'
@@ -11,8 +23,36 @@ runs:
         distribution: 'temurin'
         java-version: '17'
 
-    - name: Setup Liquibase
-      uses: liquibase/setup-liquibase@d22b8c008d6e54475bde84f50bafe9608ea42efb # v2
+    - name: Setup Liquibase Secure
+      uses: liquibase/setup-liquibase@9bd28bc8b31bd5a1651b34c7856569d5392ee869 # v3.0.0
       with:
-        version: '5.1.0'
+        version: '6.0.3'
         edition: 'secure'
+
+    # Liquibase runs on the JDK installed by setup-java, which has its own truststore.
+    # Certificates trusted by the operating system (e.g. /etc/ssl/certs) are NOT
+    # trusted by this JDK unless they are imported here.
+    - name: Trust CA certificate
+      if: inputs.ca-cert-path != ''
+      shell: bash
+      env:
+        CERT_PATH: ${{ inputs.ca-cert-path }}
+        CERT_ALIAS: ${{ inputs.ca-cert-alias }}
+      run: |
+        set -euo pipefail
+
+        keytool="${JAVA_HOME}/bin/keytool"
+        cert="${GITHUB_WORKSPACE}/${CERT_PATH}"
+
+        if [[ ! -f "$cert" ]]; then
+          echo "::error::Certificate not found: $cert"
+          exit 1
+        fi
+
+        # Import only if the alias isn't already in the truststore
+        if ! "$keytool" -list -cacerts -storepass changeit -alias "$CERT_ALIAS" >/dev/null 2>&1; then
+          if ! "$keytool" -importcert -noprompt -alias "$CERT_ALIAS" -file "$cert" -cacerts -storepass changeit; then
+            echo "::error::keytool failed to import $cert"
+            exit 1
+          fi
+        fi

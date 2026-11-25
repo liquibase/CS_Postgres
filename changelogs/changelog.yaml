@@ -22,7 +22,7 @@ databaseChangeLog:
       relativeToChangelogFile: true   
       
   - modifyChangeSets:
-      runWith: psql
+#      runWith: psql
       includeAll:
          path: datadml
          relativeToChangelogFile: true
